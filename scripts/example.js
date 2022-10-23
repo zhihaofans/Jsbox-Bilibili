@@ -1,4 +1,4 @@
-const { ModCore, ModuleLoader } = require("CoreJS"),
+const { ModCore } = require("CoreJS"),
   $ = require("$"),
   Next = require("Next");
 class Example extends ModCore {
@@ -17,14 +17,10 @@ class Example extends ModCore {
     this.$ = $;
     this.Http = $.http;
     this.Storage = Next.Storage;
-    this.ModuleLoader = new ModuleLoader(this);
-    this.ModuleLoader.addModule("example.ui.js");
   }
   run() {
     try {
       this.runSqlite();
-      const ui = this.ModuleLoader.getModule("example.ui");
-      ui.initUi();
     } catch (error) {
       $console.error(error);
     }
@@ -49,11 +45,8 @@ class Example extends ModCore {
       callback
     });
     switch (apiId) {
-      case "example.ui":
-        this.ModuleLoader.getModule("example.ui").initUi();
-
-        break;
       default:
+        callback(undefined);
     }
   }
   runSqlite() {
