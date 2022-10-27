@@ -1,6 +1,6 @@
 const { AppKernel, ModLoader } = require("CoreJS"),
   $ = require("$"),
-  modList = [ "ui.js","user.js"];
+  modList = ["ui.js", "user.js","vip.js"];
 class App extends AppKernel {
   constructor({ appId, modDir, l10nPath }) {
     super({ appId, modDir, l10nPath });
@@ -39,7 +39,7 @@ function run() {
         {
           title: "OK",
           disabled: false, // Optional
-          handler: () => {}
+           handler: () => {}
         }
       ]
     });

@@ -1,25 +1,47 @@
 const { ModCore } = require("CoreJS"),
   $ = require("$"),
   Next = require("Next");
-class Example extends ModCore {
+class UserInfo {
+  constructor(mod) {
+    this.Mod = mod;
+  }
+  isVip(callback) {
+    this.Mod.App.ModLoader.runModApi({
+      modId: "user",
+      apiId: "space.myinfo",
+      callback: data => {
+        if (data == undefined) {
+          callback(undefined);
+        } else {
+          callback(data.vip.status == 1);
+        }
+      }
+    });
+  }
+}
+class Vip extends ModCore {
   constructor(app) {
     super({
       app,
-      modId: "example",
-      modName: "例子",
-      version: "8",
+      modId: "vip",
+      modName: "大会员",
+      version: "1",
       author: "zhihaofans",
       coreVersion: 11,
       useSqlite: true,
       allowWidget: true,
       allowApi: true
     });
-    this.Http = $.http;
-    this.Storage = Next.Storage;
   }
   run() {
     try {
-      this.runSqlite();
+      new UserInfo(this).isVip(isVip => {
+        if (isVip) {
+          $ui.success("尊贵的大会员你好");
+        } else {
+          $ui.error("你不是大会员");
+        }
+      });
     } catch (error) {
       $console.error(error);
     }
@@ -44,19 +66,12 @@ class Example extends ModCore {
       callback
     });
     switch (apiId) {
+      case "info.is_vip":
+        new UserInfo(this).isVip(callback);
+        break;
       default:
         callback(undefined);
     }
   }
-  runSqlite() {
-    const sqlite_key = "last_run_timestamp",
-      lastRunTimestamp = this.SQLITE.getItem(sqlite_key);
-
-    this.SQLITE.setItem(sqlite_key, new Date().getTime().toString());
-    $console.info({
-      mod: this.MOD_INFO,
-      lastRunTimestamp
-    });
-  }
 }
-module.exports = Example;
+module.exports = Vip;

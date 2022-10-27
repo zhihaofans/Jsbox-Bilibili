@@ -11,46 +11,25 @@ class Ui extends ModCore {
       author: "zhihaofans",
       coreVersion: 11,
       //useSqlite: true,
-      allowWidget: true,
-      allowApi: true
+      allowWidget: true
+      //allowApi: true
     });
-    this.$ = $;
     this.Http = $.http;
-    this.ModLoader = app.ModLoader;
   }
-  runA(){
-    $console.warn(this.App.ModLoader)
+  runA() {
+    $console.warn(this.App.ModLoader);
   }
   run() {
     try {
       const modLoader = this.App.ModLoader;
       modLoader.runModApi({
-        modId: "user",
-        apiId: "auth.is_login",
-        callback: isLogin => {
-          if (isLogin) {
-            $ui.success("登录成功");
+        modId: "vip",
+        apiId: "info.is_vip",
+        callback: isVip => {
+          if (isVip) {
+            $ui.success("尊贵的大会员你好");
           } else {
-            
-            $ui.alert({
-              title: "未登录",
-              message: "World",
-              actions: [
-                {
-                  title: "OK",
-                  disabled: false, // Optional
-                  handler: () => {
-            
-                  }
-                },
-                {
-                  title: "Cancel",
-                  handler: () => {
-            
-                  }
-                }
-              ]
-            })
+            $ui.error("你不是大会员");
           }
         }
       });
