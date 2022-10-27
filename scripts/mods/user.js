@@ -25,9 +25,35 @@ class UserData {
     return this.Keychain.get(keychainId);
   }
 }
+class UserInfo {
+  constructor(keychain) {
+    this.Http = $.http;
+    this.Data = new UserData(keychain);
+  }
+  async mySpaceInfo() {
+    const url = "http://api.bilibili.com/x/space/myinfo",
+      header = { cookie: this.Data.cookie() },
+      timeout = 5,
+      res = await this.Http.get({
+        url,
+        header,
+        timeout
+      }),
+      result = res.data;
+    $console.info({
+      _: "mySpaceInfo",
+      header,
+      result
+    });
+    if (result && result.code == 0) {
+      return result.data;
+    }
+    return undefined;
+  }
+}
 class UserLogin {
   constructor(http, keychain) {
-    this.Http = http;
+    this.Http = http || $.http;
     this.Data = new UserData(keychain);
   }
   async getWebLoginKey() {
@@ -127,6 +153,7 @@ class UserLogin {
           $console.info({
             cookie,
             cookieSuccess,
+            scanTs,
             uidSuccess
           });
           if (this.Data.isLogin()) {
@@ -192,6 +219,9 @@ class UserMod extends ModCore {
         break;
       case "auth.login":
         new UserLogin(this.Http, this.Keychain).login(callback);
+        break;
+      case "space.myinfo":
+        callback(new UserInfo(this.Keychain).mySpaceInfo());
         break;
       default:
     }
