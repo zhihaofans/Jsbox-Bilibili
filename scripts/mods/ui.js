@@ -1,6 +1,136 @@
 const { ModCore } = require("CoreJS"),
   $ = require("$"),
   Next = require("Next");
+class UiView {
+  constructor(mod) {
+    this.Mod = mod;
+    this.ListView = new Next.ListView();
+  }
+  init() {
+    const viewList = [
+      {
+        title: "视频",
+        rows: [
+          {
+            title: "排行榜视频",
+            func: () => {
+              $safari.open({
+                url: "https://m.bilibili.com/ranking",
+                entersReader: true,
+                height: 360,
+                handler: test => {
+                  $console.info({
+                    test
+                  });
+                }
+              });
+            }
+          }
+        ]
+      },
+      {
+        title: "大会员",
+        rows: [
+          {
+            title: "大会员权益",
+            func: () => {
+              this.Mod.App.ModLoader.runModApi({
+                modId: "vip",
+                apiId: "privilege.get_status",
+                callback: result => {
+                  $console.info({
+                    result
+                  });
+
+                  if (result.code == 0) {
+                    $ui.alert({
+                      title: `(${result.code})`,
+                      message: JSON.stringify(result.data),
+                      actions: [
+                        {
+                          title: "OK",
+                          disabled: false,
+                          handler: () => {}
+                        }
+                      ]
+                    });
+                    const privilegeList = result.data.list,
+                      privilegeStr = {
+                        1: "B币",
+                        2: "会员购优惠券",
+                        3: "漫画福利券",
+                        4: "会员购包邮券"
+                      };
+                    $ui.push({
+                      props: {
+                        title: "listview"
+                      },
+                      views: [
+                        {
+                          type: "list",
+                          props: {
+                            data: privilegeList.map(privilege => {
+                              const privilegeStatus =
+                                  privilege.state == 1
+                                    ? "(已领取)"
+                                    : "(未领取)",
+                                privilegeTitle =
+                                  privilegeStr[privilege.type] || "未知";
+                              return privilegeTitle + privilegeStatus;
+                            })
+                          },
+                          layout: $layout.fill,
+                          events: {
+                            didSelect: (sender, indexPath, data) => {
+                              const thisPrivilege =
+                                privilegeList[indexPath.row];
+                              if (thisPrivilege.state == 1) {
+                                $ui.alert({
+                                  title: "领取失败",
+                                  message:
+                                    privilegeStr[thisPrivilege.type] ||
+                                    "未知" + "已领取",
+                                  actions: [
+                                    {
+                                      title: "OK",
+                                      disabled: false, // Optional
+                                      handler: () => {}
+                                    }
+                                  ]
+                                });
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    });
+                  } else {
+                    $ui.alert({
+                      title: `请求失败(${result.code})`,
+                      message: result.message,
+                      actions: [
+                        {
+                          title: "OK",
+                          disabled: false,
+                          handler: () => {}
+                        }
+                      ]
+                    });
+                  }
+                }
+              });
+            }
+          }
+        ]
+      }
+    ];
+    this.ListView.renderSimpleList(this.Mod.MOD_INFO.NAMR, viewList, () => {
+      $console.info({
+        "UiView.init": "defaultFunc"
+      });
+    });
+  }
+}
 class Ui extends ModCore {
   constructor(app) {
     super({
@@ -16,10 +146,10 @@ class Ui extends ModCore {
     });
     this.Http = $.http;
   }
-  runA() {
-    $console.warn(this.App.ModLoader);
-  }
   run() {
+    new UiView(this).init();
+  }
+  runB() {
     try {
       const modLoader = this.App.ModLoader;
       modLoader.runModApi({
@@ -28,6 +158,8 @@ class Ui extends ModCore {
         callback: isVip => {
           if (isVip) {
             $ui.success("尊贵的大会员你好");
+          } else if (isVip == undefined) {
+            $ui.error("未登录");
           } else {
             $ui.error("你不是大会员");
           }
@@ -35,28 +167,6 @@ class Ui extends ModCore {
       });
     } catch (error) {
       $console.error(error);
-    }
-  }
-  runWidget(widgetId) {
-    $widget.setTimeline({
-      render: ctx => {
-        return {
-          type: "text",
-          props: {
-            text: widgetId || "Hello!"
-          }
-        };
-      }
-    });
-  }
-  runApi({ apiId, data, callback }) {
-    $console.info({
-      apiId,
-      data,
-      callback
-    });
-    switch (apiId) {
-      default:
     }
   }
 }
