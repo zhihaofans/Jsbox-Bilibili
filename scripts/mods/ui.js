@@ -43,17 +43,6 @@ class UiView {
                   });
 
                   if (result.code == 0) {
-                    $ui.alert({
-                      title: `(${result.code})`,
-                      message: JSON.stringify(result.data),
-                      actions: [
-                        {
-                          title: "OK",
-                          disabled: false,
-                          handler: () => {}
-                        }
-                      ]
-                    });
                     const privilegeList = result.data.list,
                       privilegeStr = {
                         1: "B币",
@@ -97,6 +86,15 @@ class UiView {
                                       handler: () => {}
                                     }
                                   ]
+                                });
+                              } else {
+                                this.Mod.App.ModLoader.runModApi({
+                                  modId: "vip",
+                                  apiId: "privilege.receive_privilege",
+                                  data: {
+                                    typeId: thisPrivilege.type
+                                  },
+                                  callback: result => {}
                                 });
                               }
                             }

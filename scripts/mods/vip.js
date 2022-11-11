@@ -1,9 +1,24 @@
 const { ModCore } = require("CoreJS"),
   $ = require("$"),
   Next = require("Next");
+class AppApi {
+  constructor(mod) {
+    this.Mod = mod;
+  }
+  getCookie(callback) {
+    this.Mod.App.ModLoader.runModApi({
+      modId: "user",
+      apiId: "auth.get_cookie",
+      callback: cookie => {
+        callback(cookie);
+      }
+    });
+  }
+}
 class UserInfo {
   constructor(mod) {
     this.Mod = mod;
+    this.AppApi = new AppApi(mod);
   }
   isVip(callback) {
     this.Mod.App.ModLoader.runModApi({
@@ -23,37 +38,54 @@ class VipPrivilege {
   constructor(mod) {
     this.Mod = mod;
     this.Http = new Next.Http(5);
+    this.AppApi = new AppApi(mod);
   }
   getPrivilegeStatus(callback) {
-    this.Mod.App.ModLoader.runModApi({
-      modId: "user",
-      apiId: "auth.get_cookie",
-      callback: cookie => {
-        if (cookie == undefined) {
-          callback(undefined);
-        } else {
-          const header = { cookie },
-            url = "https://api.bilibili.com/x/vip/privilege/my",
-            handler = resp => {
-              const { data, error, response } = resp;
-              console.info({
-                data,
-                response
-              });
-              if (error) {
-                $console.error(error);
-                callback();
-              } else {
-                callback(data);
-              }
-            };
-          this.Http.getAsync({
-            url,
-            header,
-            handler
-          });
-        }
+    this.AppApi.getCookie(cookie => {
+      if (cookie == undefined) {
+        callback(undefined);
+      } else {
+        const header = { cookie },
+          url = "https://api.bilibili.com/x/vip/privilege/my",
+          handler = resp => {
+            const { data, error, response } = resp;
+
+            if (error) {
+              $console.error(error);
+              callback();
+            } else {
+              callback(data);
+            }
+          };
+        this.Http.getAsync({
+          url,
+          header,
+          handler
+        });
       }
+    });
+  }
+  receivePrivilege(typeId, callback) {
+    this.AppApi.getCookie(cookie => {
+      const bili_jct = cookie.bili_jct,
+        url = `https://api.bilibili.com/x/vip/privilege/receive?type=${typeId}&csrf=${bili_jct}`,
+        handler = resp => {
+          const { data, error, response } = resp;
+          console.info({
+            data,
+            response
+          });
+          if (error) {
+            $console.error(error);
+            callback();
+          } else {
+            callback(data);
+          }
+        };
+      this.Http.postAsync({
+        url,
+        handler
+      });
     });
   }
 }
@@ -109,6 +141,10 @@ class Vip extends ModCore {
         break;
       case "privilege.get_status":
         new VipPrivilege(this).getPrivilegeStatus(callback);
+        break;
+      case "privilege.receive_privilege":
+        new VipPrivilege(this).receivePrivilege(data.typeId, callback);
+
         break;
       default:
         callback(undefined);
