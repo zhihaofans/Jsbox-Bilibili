@@ -48,7 +48,8 @@ class UiView {
                         1: "B币",
                         2: "会员购优惠券",
                         3: "漫画福利券",
-                        4: "会员购包邮券"
+                        4: "会员购包邮券",
+                        5: "漫画商城优惠券"
                       };
                     $ui.push({
                       props: {
@@ -77,8 +78,7 @@ class UiView {
                                 $ui.alert({
                                   title: "领取失败",
                                   message:
-                                    privilegeStr[thisPrivilege.type] ||
-                                    "未知" + "已领取",
+                                    privilegeStr[thisPrivilege.type] + "已领取",
                                   actions: [
                                     {
                                       title: "OK",
