@@ -12,6 +12,23 @@ class UiView {
         title: "视频",
         rows: [
           {
+            title: "热门视频",
+            func: async () => {
+              $ui.loading(true);
+              try {
+                const popularList = await this.Popular.getPopularVideoList();
+                this.ModModule.Info.pushVideoInfoList(
+                  "前20个热门视频",
+                  popularList.list
+                );
+              } catch (error) {
+                $console.error(error);
+              } finally {
+                $ui.loading(false);
+              }
+            }
+          },
+          {
             title: "排行榜视频",
             func: () => {
               $safari.open({

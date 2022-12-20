@@ -1,21 +1,21 @@
 const { ModCore } = require("CoreJS"),
   $ = require("$"),
-  Next = require("Next");
+  { Http, Storage } = require("Next");
 class Example extends ModCore {
   constructor(app) {
     super({
       app,
       modId: "example",
       modName: "例子",
-      version: "8",
+      version: "9",
       author: "zhihaofans",
       coreVersion: 11,
       useSqlite: true,
       allowWidget: true,
       allowApi: true
     });
-    this.Http = $.http;
-    this.Storage = Next.Storage;
+    this.Http = Http;
+    this.Storage = Storage;
   }
   run() {
     try {
