@@ -1,6 +1,91 @@
 const { ModCore } = require("CoreJS"),
   $ = require("$"),
   Next = require("Next");
+class HistoryView {
+  constructor(mod) {
+    this.Mod = mod;
+  }
+  getViewList() {
+    return {
+      title: "历史/稍后",
+      rows: [
+        {
+          title: "稍后再看",
+          func: () => {
+            this.Mod.App.ModLoader.runModApi({
+              modId: "history",
+              apiId: "history.get_later_to_watch",
+              callback: result => {
+                $console.info({
+                  result
+                });
+                const title = `稍后再看共${result.length}个视频`;
+                new VideoView(this.Mod).pushVideoInfoList(title, result);
+              }
+            });
+          }
+        }
+      ]
+    };
+  }
+}
+class VideoView {
+  constructor(mod) {
+    this.Mod = mod;
+  }
+  pushVideoInfoList(title, videoList) {
+    $ui.push({
+      props: {
+        title
+      },
+      views: [
+        {
+          type: "list",
+          props: {
+            autoRowHeight: true,
+            estimatedRowHeight: 44,
+            data: videoList.map(thisVideo => {
+              return {
+                title: `${thisVideo.author_mid}@${thisVideo.author_name}`,
+                rows: [
+                  `av${thisVideo.avid} | ${thisVideo.bvid}`,
+                  thisVideo.title
+                ]
+              };
+            })
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (sender, indexPath, data) => {
+              const selectVideo = videoList[indexPath.section];
+              $ui.menu({
+                items: ["查看视频信息", "通过哔哩哔哩APP打开"],
+                handler: (title, idx) => {
+                  switch (idx) {
+                    case 0:
+                      try {
+                        this.showVideoInfo(selectVideo.bvid);
+                      } catch (error) {
+                        $console.error(error);
+                        $ui.error("Error");
+                      }
+                      break;
+                    case 1:
+                      $app.openURL(selectVideo.short_link);
+
+                      break;
+                    default:
+                  }
+                }
+              });
+            }
+          }
+        }
+      ]
+    });
+  }
+  showVideoInfo(bvid) {}
+}
 class UiView {
   constructor(mod) {
     this.Mod = mod;
@@ -137,7 +222,8 @@ class UiView {
             }
           }
         ]
-      }
+      },
+      new HistoryView(this.Mod).getViewList()
     ];
     this.ListView.renderSimpleList(this.Mod.MOD_INFO.NAMR, viewList, () => {
       $console.info({
@@ -159,7 +245,6 @@ class Ui extends ModCore {
       allowWidget: true
       //allowApi: true
     });
-    this.Http = $.http;
   }
   run() {
     new UiView(this).init();

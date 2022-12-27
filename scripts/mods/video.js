@@ -1,10 +1,11 @@
 const { ModCore } = require("CoreJS"),
   $ = require("$"),
   Next = require("Next");
-  class PopularVideo {
-    constructor(modModule) {
-      this.Module = modModule;
-    }}
+class PopularVideo {
+  constructor(modModule) {
+    this.Module = modModule;
+  }
+}
 class Video extends ModCore {
   constructor(app) {
     super({
