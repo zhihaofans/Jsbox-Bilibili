@@ -97,11 +97,28 @@ class Vip extends ModCore {
       modName: "大会员",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 11,
+      coreVersion: 12,
       useSqlite: true,
       allowWidget: true,
-      allowApi: true
+      allowApi: true,
+      apiList: [
+        {
+          apiId: "vip.info.is_vip",
+          func: ({ callback }) => new UserInfo(this).isVip(callback)
+        },
+        {
+          apiId: "vip.privilege.get_status",
+          func: ({ callback }) =>
+            new VipPrivilege(this).getPrivilegeStatus(callback)
+        },
+        {
+          apiId: "vip.privilege.receive_privilege",
+          func: ({ callback, data }) =>
+            new VipPrivilege(this).receivePrivilege(data.typeId, callback)
+        }
+      ]
     });
+    
   }
   run() {
     try {
@@ -116,6 +133,8 @@ class Vip extends ModCore {
       $console.error(error);
     }
     //$ui.success("run");
+    
+    
   }
   runWidget(widgetId) {
     $widget.setTimeline({

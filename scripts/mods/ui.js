@@ -4,6 +4,8 @@ const { ModCore } = require("CoreJS"),
 class HistoryView {
   constructor(mod) {
     this.Mod = mod;
+    this.ApiManager = mod.ApiManager;
+    this.VideoView = new VideoView(this.Mod);
   }
   getViewList() {
     return {
@@ -12,15 +14,14 @@ class HistoryView {
         {
           title: "稍后再看",
           func: () => {
-            this.Mod.App.ModLoader.runModApi({
-              modId: "history",
+            this.ApiManager.runApi({
               apiId: "history.get_later_to_watch",
               callback: result => {
                 $console.info({
                   result
                 });
                 const title = `稍后再看共${result.length}个视频`;
-                new VideoView(this.Mod).pushVideoInfoList(title, result);
+                this.VideoView.pushVideoInfoList(title, result);
               }
             });
           }
@@ -89,6 +90,7 @@ class VideoView {
 class UiView {
   constructor(mod) {
     this.Mod = mod;
+    this.ApiManager = mod.ApiManager;
     this.ListView = new Next.ListView();
   }
   init() {
@@ -136,15 +138,13 @@ class UiView {
           {
             title: "大会员权益",
             func: () => {
-              this.Mod.App.ModLoader.runModApi({
-                modId: "vip",
-                apiId: "privilege.get_status",
+              this.ApiManager.runApi({
+                apiId: "vip.privilege.get_status",
                 callback: result => {
                   $console.info({
                     result
                   });
-
-                  if (result.code == 0) {
+                  if (result.code === 0) {
                     const privilegeList = result.data.list,
                       privilegeStr = {
                         1: "B币",
@@ -163,7 +163,7 @@ class UiView {
                           props: {
                             data: privilegeList.map(privilege => {
                               const privilegeStatus =
-                                  privilege.state == 1
+                                  privilege.state === 1
                                     ? "(已领取)"
                                     : "(未领取)",
                                 privilegeTitle =
@@ -190,9 +190,8 @@ class UiView {
                                   ]
                                 });
                               } else {
-                                this.Mod.App.ModLoader.runModApi({
-                                  modId: "vip",
-                                  apiId: "privilege.receive_privilege",
+                                this.ApiManager.runApi({
+                                  apiId: "vip.privilege.receive_privilege",
                                   data: {
                                     typeId: thisPrivilege.type
                                   },
@@ -240,21 +239,20 @@ class Ui extends ModCore {
       modName: "用户界面",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 11,
+      coreVersion: 12,
       //useSqlite: true,
       allowWidget: true
       //allowApi: true
     });
   }
   run() {
+    $.info(this.ApiManager.API_LIST)
     new UiView(this).init();
   }
   runB() {
     try {
-      const modLoader = this.App.ModLoader;
-      modLoader.runModApi({
-        modId: "vip",
-        apiId: "info.is_vip",
+      this.ApiManager.runApi({
+        apiId: "vip.info.is_vip",
         callback: isVip => {
           if (isVip) {
             $ui.success("尊贵的大会员你好");

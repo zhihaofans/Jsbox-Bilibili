@@ -24,13 +24,12 @@ class PublishItemData {
   }
 }
 class UserData {
-  constructor(mod) {
-    this.Mod = mod;
+  constructor(ApiManager) {
+    this.ApiManager = ApiManager;
   }
   getCookie(callback) {
-    this.Mod.App.ModLoader.runModApi({
-      modId: "user",
-      apiId: "auth.get_cookie",
+    this.ApiManager.runApi({
+      apiId: "user.auth.get_cookie",
       callback: cookie => {
         callback(cookie);
       }
@@ -40,13 +39,13 @@ class UserData {
 class LaterToWatchCore {
   constructor(mod) {
     this.Mod = mod;
-    this.UserData = new UserData(mod);
+    this.UserData = new UserData(mod.App.ModLoader.ApiManager);
     this.Http = new Http(5);
     this.Http.setDebug(true);
   }
   getLaterToWatch(callback) {
     this.UserData.getCookie(cookie => {
-      if (cookie == undefined) {
+      if (cookie === undefined) {
         callback(undefined);
       } else {
         const url = "https://api.bilibili.com/x/v2/history/toview",
@@ -56,7 +55,7 @@ class LaterToWatchCore {
               cookie
             },
             callback: result => {
-              $console.info(result);
+              $.info(result);
               if (result.code == 0) {
                 const data = result.data,
                   listCount = data.count;
@@ -68,14 +67,14 @@ class LaterToWatchCore {
                     );
                     callback(later2watchList);
                   } catch (error) {
-                    $console.error(error);
+                    $.error(error);
                     callback(undefined);
                   }
                 } else {
                   callback(undefined);
                 }
               } else {
-                $console.error({
+                $.error({
                   result
                 });
                 callback(undefined);
@@ -94,18 +93,23 @@ class History extends ModCore {
       modName: "历史记录",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 11,
+      coreVersion: 12,
       //useSqlite: true,
       allowWidget: true,
-      allowApi: true
+      allowApi: true,
+      apiList: [
+        {
+          apiId: "history.get_later_to_watch",
+          func: ({ callback }) =>
+            new LaterToWatchCore(this).getLaterToWatch(callback)
+        }
+      ]
     });
-    this.User = new UserData(this);
-    this.Later2Watch = new LaterToWatchCore(this);
   }
   run() {
     try {
     } catch (error) {
-      $console.error(error);
+      $.error(error);
     }
     //$ui.success("run");
   }
@@ -122,7 +126,7 @@ class History extends ModCore {
     });
   }
   runApi({ apiId, data, callback }) {
-    $console.info({
+    $.info({
       apiId,
       data,
       callback

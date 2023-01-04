@@ -1,15 +1,9 @@
-const { AppKernel, ModLoader } = require("CoreJS"),
+const { AppKernel } = require("CoreJS"),
   $ = require("$"),
-  modList = ["ui.js", "user.js", "vip.js", "video.js", "history.js"];
+  loadModList = ["ui.js", "user.js", "vip.js", "video.js", "history.js"];
 class App extends AppKernel {
-  constructor({ appId, modDir, l10nPath }) {
-    super({ appId, modDir, l10nPath });
-    this.ModLoader = new ModLoader({
-      app: this,
-      appMode: true,
-      modDir,
-      modList
-    });
+  constructor({ appId, modDir, l10nPath, modList }) {
+    super({ appId, modDir, l10nPath, modList });
   }
   init() {
     try {
@@ -27,7 +21,8 @@ function run() {
     const app = new App({
       appId: "jsbox.bilibili",
       modDir: "/scripts/mods/",
-      l10nPath: "/strings/l10n.js"
+      l10nPath: "/strings/l10n.js",
+      modList: loadModList
     });
     app.init();
   } catch (error) {

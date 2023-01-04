@@ -180,9 +180,34 @@ class UserMod extends ModCore {
       modName: "用户模块",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 11,
+      coreVersion: 12,
       useSqlite: true,
-      allowApi: true
+      allowApi: true,
+      apiList: [
+        {
+          apiId: "user.auth.get_cookie",
+          func: ({ callback }) => callback(new UserData(this.Keychain).cookie())
+        },
+        {
+          apiId: "user.auth.get_uid",
+          func: ({ callback }) => callback(new UserData(this.Keychain).uid())
+        },
+        {
+          apiId: "user.auth.is_login",
+          func: ({ callback }) =>
+            callback(new UserData(this.Keychain).isLogin())
+        },
+        {
+          apiId: "user.auth.login",
+          func: ({ callback }) =>
+            new UserLogin(this.Http, this.Keychain).login(callback)
+        },
+        {
+          apiId: "user.space.myinfo",
+          func: ({ callback }) =>
+            callback(new UserInfo(this.Keychain).mySpaceInfo())
+        }
+      ]
     });
     this.$ = $;
     this.Http = $.http;
