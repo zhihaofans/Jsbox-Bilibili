@@ -7,14 +7,14 @@ class Example extends ModCore {
       app,
       modId: "example",
       modName: "例子",
-      version: "9",
+      version: "10",
       author: "zhihaofans",
-      coreVersion: 11,
+      coreVersion: 12,
       useSqlite: true,
       allowWidget: true,
       allowApi: true
     });
-    this.Http = Http;
+    this.Http = new Http(5);
     this.Storage = Storage;
   }
   run() {
