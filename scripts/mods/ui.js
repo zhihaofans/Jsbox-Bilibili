@@ -33,6 +33,7 @@ class HistoryView {
 class VideoView {
   constructor(mod) {
     this.Mod = mod;
+    this.ApiManager = mod.ApiManager;
   }
   pushVideoInfoList(title, videoList) {
     $ui.push({
@@ -85,7 +86,156 @@ class VideoView {
       ]
     });
   }
-  showVideoInfo(bvid) {}
+  showVideoInfo(bvid) {
+    if (bvid != undefined && bvid.length > 0) {
+      $ui.loading(true);
+      this.ApiManager.runApi({
+        apiId: "video.info.get_info",
+        data: {
+          bvid
+        },
+        callback: videoInfo => {
+          if (videoInfo !== undefined) {
+            $.info(videoInfo);
+            const videoInfoList = [
+              {
+                title: "视频id",
+                items: [
+                  {
+                    title: videoInfo.bvid,
+                    func: () => {}
+                  },
+                  {
+                    title: "av" + videoInfo.aid,
+                    func: undefined
+                  }
+                ]
+              },
+              {
+                title: "标题",
+                items: [
+                  {
+                    title: videoInfo.title,
+                    func: () => {
+                      $share.sheet([videoInfo.title]);
+                    }
+                  }
+                ]
+              },
+              {
+                title: "作者",
+                items: [
+                  {
+                    title: videoInfo.owner.mid,
+                    func: () => {
+                      this.ApiManager.runApi({
+                        apiId: "bilibili.app.user.space",
+                        data: {
+                          uid: videoInfo.owner.mid
+                        }
+                      });
+                    }
+                  },
+                  {
+                    title: "@" + videoInfo.owner.name,
+                    func: () => {
+                      $share.sheet([videoInfo.owner.name]);
+                    }
+                  },
+                  {
+                    title: "查看头像",
+                    func: () => {
+                      $ui.preview({
+                        url: videoInfo.owner.face
+                      });
+                    }
+                  }
+                ]
+              },
+              {
+                title: "视频封面",
+                items: [
+                  {
+                    title: videoInfo.pic,
+                    func: () => {
+                      $ui.menu({
+                        items: ["预览", "下载"],
+                        handler: (title, idx) => {
+                          switch (idx) {
+                            case 0:
+                              $ui.preview({
+                                url: videoInfo.pic
+                              });
+                              break;
+                            case 1:
+                              try {
+                                $console.warn("try downloading");
+                                this.Mod.App.ModLoader.runModApi({
+                                  modId: "downloader",
+                                  apiId: "start_downloading",
+                                  data: { url: videoInfo.pic }
+                                });
+                                $console.warn("finished try");
+                              } catch (error) {
+                                $console.error(error);
+                                $ui.error("下载失败");
+                              }
+                              break;
+                            default:
+                          }
+                        }
+                      });
+                    }
+                  }
+                ]
+              }
+            ];
+            $ui.loading(false);
+            $ui.push({
+              props: {
+                title: bvid
+              },
+              views: [
+                {
+                  type: "list",
+                  props: {
+                    autoRowHeight: true,
+                    estimatedRowHeight: 10,
+                    data: videoInfoList.map(listItem => {
+                      return {
+                        title: listItem.title.toString(),
+                        rows: listItem.items.map(item => item.title.toString())
+                      };
+                    })
+                  },
+                  layout: $layout.fill,
+                  events: {
+                    didSelect: (sender, indexPath, data) => {
+                      const section = indexPath.section,
+                        row = indexPath.row,
+                        selectedItem = videoInfoList[section].items[row];
+                      if ($.isFunction(selectedItem.func))
+                        try {
+                          selectedItem.func(sender, data);
+                        } catch (error) {
+                          $console.error(error);
+                        }
+                    }
+                  }
+                }
+              ]
+            });
+          } else {
+            $ui.loading(false);
+            $ui.error("空白请求结果,请检查视频id与设备网络");
+          }
+        }
+      });
+    } else {
+      $ui.loading(false);
+      $ui.error("请输入视频id");
+    }
+  }
 }
 class UiView {
   constructor(mod) {
@@ -246,7 +396,7 @@ class Ui extends ModCore {
     });
   }
   run() {
-    $.info(this.ApiManager.API_LIST)
+    $.info(this.ApiManager.API_LIST);
     new UiView(this).init();
   }
   runB() {

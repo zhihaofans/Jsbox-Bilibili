@@ -1,6 +1,13 @@
 const { AppKernel } = require("CoreJS"),
   $ = require("$"),
-  loadModList = ["ui.js", "user.js", "vip.js", "video.js", "history.js"];
+  loadModList = [
+    "ui.js",
+    "user.js",
+    "vip.js",
+    "video.js",
+    "history.js",
+    "app.js"
+  ];
 class App extends AppKernel {
   constructor({ appId, modDir, l10nPath, modList }) {
     super({ appId, modDir, l10nPath, modList });

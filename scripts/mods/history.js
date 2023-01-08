@@ -39,6 +39,7 @@ class UserData {
 class LaterToWatchCore {
   constructor(mod) {
     this.Mod = mod;
+    this.ApiManager=mod.ApiManager
     this.UserData = new UserData(mod.App.ModLoader.ApiManager);
     this.Http = new Http(5);
     this.Http.setDebug(true);

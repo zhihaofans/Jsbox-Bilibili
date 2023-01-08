@@ -14,14 +14,14 @@ class HttpKit {
       header,
       handler: resp => {
         if (this.DEBUG) {
-          $console.info({
-            _FILE: "http.js",
-            _FUNCTION: "HttpKit.get",
-            url,
-            params,
-            header,
-            resp
-          });
+          //          $console.info({
+          //            _FILE: "http.js",
+          //            _FUNCTION: "HttpKit.get",
+          //            url,
+          //            params,
+          //            header,
+          //            resp
+          //          });
         }
         if (resp.error) {
           if (this.DEBUG) $console.error(resp.error);

@@ -46,7 +46,7 @@ class VideoInfo {
                 }
               }
             };
-          this.Http.getAsync({
+          this.Mod.Http.getAsync({
             url,
             header: { cookie },
             handler
@@ -73,7 +73,7 @@ class Video extends ModCore {
           func: ({ callback, data }) =>
             new VideoInfo(this).getVideoInfo({
               callback,
-              bvid: data.bvid
+              bvid: data.bvid||undefined
             })
         }
       ]
