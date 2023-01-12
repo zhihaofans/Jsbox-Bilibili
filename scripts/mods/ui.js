@@ -17,11 +17,32 @@ class HistoryView {
             this.ApiManager.runApi({
               apiId: "history.get_later_to_watch",
               callback: result => {
+                if (result === undefined) {
+                  $ui.error("登录失效或账号异常");
+                } else {
+                  const title = `稍后再看共${result.length}个视频`;
+                  this.VideoView.pushVideoInfoList(title, result);
+                }
                 $console.info({
                   result
                 });
-                const title = `稍后再看共${result.length}个视频`;
-                this.VideoView.pushVideoInfoList(title, result);
+              }
+            });
+          }
+        },
+        {
+          title: "移除所有已看的稍后再看",
+          func: () => {
+            this.ApiManager.runApi({
+              apiId: "history.later_to_watch.remove_all_viewed",
+              callback: result => {
+                if (result === undefined) {
+                  $ui.error("移除失败，未登录！");
+                } else if (result === true) {
+                  $ui.success("移除成功");
+                } else {
+                  $ui.error("移除失败");
+                }
               }
             });
           }
@@ -288,9 +309,11 @@ class UiView {
           {
             title: "大会员权益",
             func: () => {
+              $ui.loading(true);
               this.ApiManager.runApi({
                 apiId: "vip.privilege.get_status",
                 callback: result => {
+                  $ui.loading(false);
                   $console.info({
                     result
                   });
@@ -397,7 +420,20 @@ class Ui extends ModCore {
   }
   run() {
     $.info(this.ApiManager.API_LIST);
-    new UiView(this).init();
+    this.ApiManager.runApi({
+      apiId: "user.auth.is_login",
+      callback: isLogin => {
+        if (isLogin) {
+          new UiView(this).init();
+        } else {
+          $ui.error("未登录");
+          this.ApiManager.runApi({
+            apiId: "user.auth.login",
+            callback: result => {}
+          });
+        }
+      }
+    });
   }
   runB() {
     try {

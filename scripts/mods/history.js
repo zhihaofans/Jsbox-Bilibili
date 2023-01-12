@@ -39,7 +39,7 @@ class UserData {
 class LaterToWatchCore {
   constructor(mod) {
     this.Mod = mod;
-    this.ApiManager=mod.ApiManager
+    this.ApiManager = mod.ApiManager;
     this.UserData = new UserData(mod.App.ModLoader.ApiManager);
     this.Http = new Http(5);
     this.Http.setDebug(true);
@@ -57,7 +57,7 @@ class LaterToWatchCore {
             },
             callback: result => {
               $.info(result);
-              if (result.code == 0) {
+              if (result.code === 0) {
                 const data = result.data,
                   listCount = data.count;
 
@@ -72,9 +72,14 @@ class LaterToWatchCore {
                     callback(undefined);
                   }
                 } else {
-                  callback(undefined);
+                  callback([]);
                 }
               } else {
+                if (result.code === -101) {
+                  this.ApiManager.runApi({
+                    "apiId": "user.auth.logout"
+                  });
+                }
                 $.error({
                   result
                 });
@@ -83,6 +88,55 @@ class LaterToWatchCore {
             }
           });
       }
+    });
+  }
+  removeLaterToWatch({ viewed, aid, callback }) {
+    this.UserData.getCookie(cookie => {
+      if (cookie === undefined) {
+        callback(undefined);
+      } else {
+        const url = "http://api.bilibili.com/x/v2/history/toview/del",
+          csrf = cookie.bili_jct,
+          resp = this.Http.post({
+            url,
+            body: {
+              csrf,
+              viewed,
+              aid
+            },
+            header: {
+              cookie
+            },
+            callback: result => {
+              $.info(result);
+              const codeStrList = {
+                  "0": "成功",
+                  "-101": "账号未登录",
+                  "-111": "csrf校验失败",
+                  "-400": "请求错误"
+                },
+                { code, message } = result;
+              $.info({
+                code,
+                message,
+                codeStr: codeStrList[code.toString()]
+              });
+              callback(code !== undefined && code === 0);
+            }
+          });
+      }
+    });
+  }
+  removeAllViewed(callback) {
+    this.removeLaterToWatch({
+      callback,
+      viewed: true
+    });
+  }
+  removeVideo({ aid, callback }) {
+    this.removeLaterToWatch({
+      callback,
+      aid
     });
   }
 }
@@ -103,6 +157,11 @@ class History extends ModCore {
           apiId: "history.get_later_to_watch",
           func: ({ callback }) =>
             new LaterToWatchCore(this).getLaterToWatch(callback)
+        },
+        {
+          apiId: "history.later_to_watch.remove_all_viewed",
+          func: ({ callback }) =>
+            new LaterToWatchCore(this).removeAllViewed(callback)
         }
       ]
     });

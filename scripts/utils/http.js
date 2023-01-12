@@ -32,19 +32,20 @@ class HttpKit {
       }
     });
   }
-  post({ url, params, header, callback = result => {} }) {
+  post({ url, params, body, header, callback = result => {} }) {
     this.Http.postAsync({
       url,
       params,
+      body,
       header,
       handler: resp => {
-        const data = resp.data;
         if (this.DEBUG) {
           $console.info({
             _FILE: "http.js",
-            _FUNCTION: "HttpKit.get",
+            _FUNCTION: "HttpKit.post",
             url,
             params,
+            body,
             header,
             resp
           });

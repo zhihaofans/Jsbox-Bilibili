@@ -6,9 +6,8 @@ class AppApi {
     this.Mod = mod;
   }
   getCookie(callback) {
-    this.Mod.App.ModLoader.runModApi({
-      modId: "user",
-      apiId: "auth.get_cookie",
+    this.Mod.ApiManager.runApi({
+      apiId: "user.auth.get_cookie",
       callback: cookie => {
         callback(cookie);
       }
@@ -18,12 +17,10 @@ class AppApi {
 class UserInfo {
   constructor(mod) {
     this.Mod = mod;
-    this.AppApi = new AppApi(mod);
   }
   isVip(callback) {
-    this.Mod.App.ModLoader.runModApi({
-      modId: "user",
-      apiId: "space.myinfo",
+    this.Mod.ApiManager.runApi({
+      apiId: "user.space.myinfo",
       callback: data => {
         if (data == undefined || data.vip == undefined) {
           callback(undefined);
@@ -118,7 +115,6 @@ class Vip extends ModCore {
         }
       ]
     });
-    
   }
   run() {
     try {
@@ -133,8 +129,6 @@ class Vip extends ModCore {
       $console.error(error);
     }
     //$ui.success("run");
-    
-    
   }
   runWidget(widgetId) {
     $widget.setTimeline({
@@ -155,16 +149,6 @@ class Vip extends ModCore {
       callback
     });
     switch (apiId) {
-      case "info.is_vip":
-        new UserInfo(this).isVip(callback);
-        break;
-      case "privilege.get_status":
-        new VipPrivilege(this).getPrivilegeStatus(callback);
-        break;
-      case "privilege.receive_privilege":
-        new VipPrivilege(this).receivePrivilege(data.typeId, callback);
-
-        break;
       default:
         callback(undefined);
     }

@@ -5,24 +5,38 @@ const { ModCore } = require("CoreJS"),
 class UserData {
   constructor(keychain) {
     this.Keychain = keychain;
+    this.KeychainKey = {
+      cookie: "user.login.cookie",
+      uid: "user.login.uid"
+    };
   }
   cookie(newCookie) {
-    const keychainId = "user.login.cookie";
     if (newCookie != undefined && Object.keys(newCookie).length > 0) {
-      this.Keychain.set(keychainId, JSON.stringify(newCookie));
+      this.Keychain.set(this.KeychainKey.cookie, JSON.stringify(newCookie));
     }
-    const nowCookie = this.Keychain.get(keychainId);
+    const nowCookie = this.Keychain.get(this.KeychainKey.cookie);
     return nowCookie ? JSON.parse(nowCookie) : undefined;
   }
   isLogin() {
     return $.hasString(this.uid()) && this.cookie() != undefined;
   }
   uid(newUid) {
-    const keychainId = "user.login.uid";
     if ($.string.hasString(newUid)) {
-      this.Keychain.set(keychainId, newUid);
+      this.Keychain.set(this.KeychainKey.uid, newUid);
     }
-    return this.Keychain.get(keychainId);
+    return this.Keychain.get(this.KeychainKey.uid);
+  }
+  csrf() {
+    const cookie = this.cookie();
+    if (cookie === undefined || cookie.csrf === undefined) {
+      return undefined;
+    } else {
+      return cookie.csrf;
+    }
+  }
+  clearData() {
+    this.Keychain.remove(this.KeychainKey.uid);
+    this.Keychain.remove(this.KeychainKey.cookie);
   }
 }
 class UserInfo {
@@ -86,7 +100,7 @@ class UserLogin {
     $console.info({
       loginKey
     });
-    if (loginKey != undefined) {
+    if (loginKey !== undefined) {
       const menuList = ["查看二维码", "已扫二维码"],
         didSelect = index => {
           switch (index) {
@@ -101,7 +115,8 @@ class UserLogin {
           }
         };
       $ui.loading(false);
-      ListViewKit.pushSimpleText("二维码登录", menuList, didSelect);
+      ListViewKit.renderSimpleText("二维码登录", menuList, didSelect);
+      $.info("login");
     } else {
       $ui.loading(false);
       $ui.error("获取二维码登录凭证失败");
@@ -157,7 +172,7 @@ class UserLogin {
             uidSuccess
           });
           if (this.Data.isLogin()) {
-            $ui.success("登录成功，请返回");
+            $ui.success("登录成功，请返回或重新打开");
           } else {
             $ui.error("登录失败，空白cookie");
           }
@@ -170,6 +185,9 @@ class UserLogin {
     } else {
       return undefined;
     }
+  }
+  logout() {
+    this.Data.clearData();
   }
 }
 class UserMod extends ModCore {
@@ -199,8 +217,11 @@ class UserMod extends ModCore {
         },
         {
           apiId: "user.auth.login",
-          func: ({ callback }) =>
-            new UserLogin(this.Http, this.Keychain).login(callback)
+          func: () => new UserLogin(this.Http, this.Keychain).login()
+        },
+        {
+          apiId: "user.auth.logout",
+          func: () => new UserLogin(this.Http, this.Keychain).logout()
         },
         {
           apiId: "user.space.myinfo",
@@ -233,22 +254,8 @@ class UserMod extends ModCore {
       callback
     });
     switch (apiId) {
-      case "auth.get_cookie":
-        callback(new UserData(this.Keychain).cookie());
-        break;
-      case "auth.get_uid":
-        callback(new UserData(this.Keychain).uid());
-        break;
-      case "auth.is_login":
-        callback(new UserData(this.Keychain).isLogin());
-        break;
-      case "auth.login":
-        new UserLogin(this.Http, this.Keychain).login(callback);
-        break;
-      case "space.myinfo":
-        callback(new UserInfo(this.Keychain).mySpaceInfo());
-        break;
       default:
+        callback(undefined);
     }
     return;
   }
