@@ -1,5 +1,7 @@
 class ListView {
-  constructor() {}
+  constructor() {
+    this.ViewKit = new ViewKit();
+  }
   showSimpleText(title, textList, didSelect = index => {}) {
     const view = {
       props: {
@@ -22,8 +24,14 @@ class ListView {
         }
       ]
     };
-    $ui.window === undefined ? $ui.render(view) : $ui.push(view);
+    this.ViewKit.showView(view);
     $console.info("showSimpleText");
+  }
+}
+class ViewKit {
+  constructor() {}
+  showView(viewData) {
+    $ui.window === undefined ? $ui.render(viewData) : $ui.push(viewData);
   }
 }
 module.exports = {
