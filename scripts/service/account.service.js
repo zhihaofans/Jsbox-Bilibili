@@ -1,5 +1,6 @@
 const { hasString } = require("../util/String");
-const { HttpUtil } = require("./http.service");
+const { HttpService, HttpUtil } = require("./http.service");
+const UrlUtil = require("../util/Url");
 const BilibiliApi = require("BilibiliApi");
 class UserDataService {
   constructor() {
@@ -40,6 +41,7 @@ class UserDataService {
 }
 class LoginService {
   constructor() {
+    this.HttpService = new HttpService();
     this.Api = new BilibiliApi.AccountLoginApi();
     this.userData = new UserDataService();
   }
@@ -94,10 +96,57 @@ class LoginService {
       }
     });
   }
-  loginByQrcode() {
+  getQrcodeKey() {
     return new Promise((resolve, reject) => {
-      $ui.loading(true);
-      reject();
+      const url =
+        "https://passport.bilibili.com/x/passport-login/web/qrcode/generate";
+      $http
+        .get({
+          url
+        })
+        .then(resp => {
+          const result = resp.data;
+          if (result.code === 0) {
+            resolve(result.data);
+          } else {
+            reject(result);
+          }
+        })
+        .catch(fail => {
+          reject(fail);
+        });
+    });
+  }
+  loginByQrcode(qrcode_key) {
+    return new Promise((resolve, reject) => {
+      const url = `https://passport.bilibili.com/x/passport-login/web/qrcode/poll?qrcode_key=${qrcode_key}`;
+      $http
+        .get({
+          url
+        })
+        .then(resp => {
+          const result = resp.data;
+
+          $console.info(resp.response.headers);
+          if (result.code === 0) {
+            const { code, refresh_token, url, timestamp } = result.data;
+            if (code === 0) {
+              const urlPar = UrlUtil.getParameters(url),
+                Cookies = resp.response.headers["Set-Cookie"];
+              this.userData.setCookie(Cookies);
+              $console.info({
+                urlPar,
+                Cookies
+              });
+            }
+            resolve(result.data);
+          } else {
+            reject(result);
+          }
+        })
+        .catch(fail => {
+          reject(fail);
+        });
     });
   }
   logout() {
@@ -122,11 +171,17 @@ class AccountService {
   getCsrf() {
     return this.UserDataService.getCsrf();
   }
+  getQrcodeKey() {
+    return this.LoginService.getQrcodeKey();
+  }
   isLogin() {
     return this.LoginService.isLogin();
   }
   importCookie() {
     return this.LoginService.inportCookie();
+  }
+  loginByQrcode(qrcode_key) {
+    return this.LoginService.loginByQrcode(qrcode_key);
   }
   logout() {
     this.LoginService.logout();

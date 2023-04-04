@@ -1,6 +1,7 @@
 const { PublishItemData } = require("../model/history.model");
 const HistoryService = require("../service/history.service");
 const { ListView } = require("../util/View");
+const AppService=require("../service/app.service")
 class VideoList {
   constructor() {
     this.ListView = new ListView();
@@ -15,6 +16,7 @@ class VideoList {
       didSelect = index => {
         const videoItem = videoList[index];
         $console.info(videoItem);
+        AppService.openVideo(videoItem.bvid)
       };
     this.ListView.showSimpleText(title, textList, didSelect);
   }

@@ -37,6 +37,7 @@ class VideoInfoService {
       });
     }
   }
+  
 }
 module.exports = {
   VideoInfoService
