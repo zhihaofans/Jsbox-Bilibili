@@ -112,7 +112,7 @@ class ImageView {
     buttonOneTitle,
     buttonOneTapped,
     buttonTwoTitle,
-        buttonTwoTapped
+    buttonTwoTapped
   }) {
     this.ViewKit.showView({
       props: {

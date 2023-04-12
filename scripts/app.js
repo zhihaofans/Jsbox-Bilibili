@@ -13,6 +13,7 @@ class App extends AppKernel {
     this.Global = new GlobalStorage(this.AppInfo.id);
   }
   init() {
+    $ui.loading("正在初始化...");
     const accountService = new AccountService(),
       userService = new UserService();
     const mainView = new MainView();
@@ -23,11 +24,12 @@ class App extends AppKernel {
           .checkLoginStatus()
           .then(
             result => {
+              $ui.loading(false);
               $console.info("checkLoginStatus.result");
-              if(result===undefined){
-                $ui.error("未知错误")
-              }else if (result === true) {
-                $ui.success("已登录");
+              if (result === undefined) {
+                $ui.error("未知错误");
+              } else if (result === true) {
+                //$ui.success("已登录");
                 $console.info("main");
                 mainView.init();
               } else {
@@ -36,6 +38,7 @@ class App extends AppKernel {
               }
             },
             fail => {
+              $ui.loading(false);
               $console.error({
                 checkLogin: fail
               });
@@ -53,6 +56,7 @@ class App extends AppKernel {
             });
           });
       } catch (error) {
+        $ui.loading(false);
         $console.error(error);
         $ui.alert({
           title: "发生未知错误",
@@ -70,6 +74,7 @@ class App extends AppKernel {
       }
     } else {
       //$ui.error("未登录");
+      $ui.loading(false);
       new LoginView()
         .login()
         .then(loginResult => mainView.init())
@@ -101,6 +106,19 @@ function init() {
     new App().init();
   } catch (error) {
     $console.error(error);
+    $ui.alert({
+      title: "‼️",
+      message: error.message,
+      actions: [
+        {
+          title: "Bye~",
+          disabled: false, // Optional
+          handler: () => {
+            $app.close();
+          }
+        }
+      ]
+    });
   } finally {
     $console.info("init finish");
   }

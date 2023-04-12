@@ -7,11 +7,14 @@ class MainView {
   }
   init() {
     const title = "哔哩哔哩(已登录)",
-      textList = ["观看历史"],
+      textList = ["观看历史", "稍后再看"],
       didSelect = index => {
         switch (index) {
           case 0:
             this.HistoryView.showHistory();
+            break;
+          case 1:
+            this.HistoryView.showLaterToView();
             break;
           default:
         }

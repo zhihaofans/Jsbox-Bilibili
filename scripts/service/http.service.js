@@ -118,6 +118,12 @@ class HttpService {
       }
     });
   }
+  getThen({ url, params, header }) {
+    return $http.get({
+      url: this.concatUrlParams(url, params),
+      header
+    });
+  }
   addParamsToUrl(params) {
     //const params = {aaa: "aaa"};
     const keys = Object.keys(params);
@@ -156,6 +162,16 @@ class HttpService {
     } else {
       return undefined;
     }
+  }
+  getParamsFromUrl(URL) {
+    return JSON.parse(
+      '{"' +
+        decodeURI(URL.split("?")[1])
+          .replace(/"/g, '\\"')
+          .replace(/&/g, '","')
+          .replace(/=/g, '":"') +
+        '"}'
+    );
   }
 }
 module.exports = {
