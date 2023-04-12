@@ -33,8 +33,23 @@ class App extends AppKernel {
                 $console.info("main");
                 mainView.init();
               } else {
-                accountService.logout();
-                $ui.error("登录已失效,请重新登录");
+                $ui.alert({
+                  title: "登录已失效,是否重新登录？",
+                  message: "也可能是网络问题导致获取数据失败",
+                  actions: [
+                    {
+                      title: "退出登录",
+                      disabled: false, // Optional
+                      handler: () => {
+                        accountService.logout();
+                      }
+                    },
+                    {
+                      title: "不理",
+                      handler: () => {}
+                    }
+                  ]
+                });
               }
             },
             fail => {
