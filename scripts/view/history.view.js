@@ -6,88 +6,6 @@ class VideoList {
   constructor() {
     this.ListView = new ListView();
   }
-  showVideoList(title, videoList, isHistory = false) {
-    const itemList = videoList.map(thisVideo => {
-        //      $console.info({
-        //        thisVideo
-        //      });
-        let itemTitle = `${thisVideo.author_mid}@${thisVideo.author_name}`,
-          rows = [];
-        switch (thisVideo.business) {
-          case "pgc":
-            itemTitle = thisVideo.badge;
-            rows = [`《${thisVideo.title}》`, thisVideo.show_title];
-            break;
-          case "article":
-            rows = [`article.${thisVideo.kid}[专栏文章]`, thisVideo.title];
-
-            break;
-          default:
-            rows = [`${thisVideo.bvid}`, thisVideo.title];
-        }
-        return {
-          title: itemTitle,
-          rows
-        };
-      }),
-      didSelect = (section, row) => {
-        const videoItem = videoList[section];
-        $console.info(videoItem);
-        if (isHistory === true) {
-          switch (videoItem.business) {
-            case "pgc":
-              AppService.openBangumi(videoItem.kid);
-              break;
-            case "article":
-              AppService.openArticle(videoItem.kid);
-              break;
-            default:
-              AppService.openVideo(videoItem.bvid);
-          }
-        } else {
-          AppService.openVideo(videoItem.bvid);
-        }
-      },
-      actions = [
-        {
-          title: "继续看",
-          color: $color("red"), // default to gray
-          handler: (sender, indexPath) => {
-            const { section } = indexPath,
-              thisItem = videoList[section];
-            $console.info({
-              thisItem
-            });
-            if (isHistory) {
-              $ui.error("历史记录不支持");
-            } else {
-              $app.openURL(thisItem.uri);
-              $ui.success("ok");
-            }
-          }
-        }
-      ];
-    $ui.push({
-      props: {
-        title
-      },
-      views: [
-        {
-          type: "list",
-          props: {
-            data: itemList,
-            autoRowHeight: true,
-            actions
-          },
-          layout: $layout.fill,
-          events: {
-            didSelect: (sender, indexPath, data) =>
-              didSelect(indexPath.section, indexPath.row)
-          }
-        }
-      ]
-    });
-  }
   showVideoListNew(title, videoList, isHistory = false) {
     const itemList = videoList.map(thisVideo => {
         //      $console.info({
@@ -266,7 +184,7 @@ class HistoryView {
             historyList
           });
           $ui.loading(false);
-          new VideoList().showVideoList("历史观看", historyList, true);
+          new VideoList().showVideoListNew("历史观看", historyList, true);
         } catch (error) {
           $ui.loading(false);
           $console.error(error);
