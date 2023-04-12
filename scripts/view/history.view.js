@@ -171,12 +171,30 @@ class VideoList {
                 align: $align.center,
                 font: $font(12)
               }
-            },
+            }
           },
           layout: $layout.fill,
           events: {
             didSelect: (sender, indexPath, data) =>
-              didSelect(indexPath.section, indexPath.row)
+              didSelect(indexPath.section, indexPath.row),
+            didLongPress: function (sender, indexPath, data) {
+              $console.info(indexPath);
+              const selectItem = videoList[indexPath.row];
+              $ui.menu({
+                items: ["获取封面"],
+                handler: (title, idx) => {
+                  switch (idx) {
+                    case 0:
+                      $ui.preview({
+                        title: "稿件封面图",
+                        url: selectItem.cover_image
+                      });
+                      break;
+                    default:
+                  }
+                }
+              });
+            }
           }
         }
       ]
