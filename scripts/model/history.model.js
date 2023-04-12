@@ -8,7 +8,7 @@ class PublishItemData {
     this.business = videoData.history?.business; //历史类型：archive：稿件，pgc：剧集（番剧 / 影视），live：直播，article-list：文集，article：文章
     this.bvid = videoData.bvid || videoData.history?.bvid;
     this.copyright = videoData.copyright; //1：原创 2：转载
-    this.cover_image = videoData.pic; //视频封面
+    this.cover_image = videoData.pic || videoData.cover || videoData.covers[0]; //视频封面
     this.desc = videoData.desc; //简介
     this.kid = videoData.kid;
     this.parts_count = videoData.videos; //稿件分P总数
