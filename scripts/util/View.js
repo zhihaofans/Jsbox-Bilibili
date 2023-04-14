@@ -171,10 +171,172 @@ class ImageView {
     });
   }
 }
+class NavView {
+  constructor() {
+    this.ViewKit = new ViewKit();
+  }
+  setItemClicked({ view }) {}
+  getNavView({
+    items = [{ title: "主页", icon: "square.grid.2x2.fill", func: () => {} }]
+  }) {
+    //$ui.render("main");
+    const mIconSymbols = [
+      "square.grid.2x2.fill",
+      "square.and.arrow.down.fill",
+      "person.fill"
+    ];
+    return {
+      type: "matrix",
+      props: {
+        id: "tab",
+        columns: 3,
+        itemHeight: 50,
+        spacing: 0,
+        scrollEnabled: false,
+        bgcolor: $color("clear"),
+        template: [
+          {
+            type: "view",
+            layout: function (make, view) {
+              make.size.equalTo(view.super);
+              make.center.equalTo(view.super);
+            },
+            views: [
+              {
+                type: "image",
+                props: {
+                  id: "menu_image",
+                  resizable: true,
+                  clipsToBounds: false
+                },
+                layout: function (make, view) {
+                  make.centerX.equalTo(view.super);
+                  make.size.equalTo($size(25, 25));
+                  make.top.inset(6);
+                }
+              },
+              {
+                type: "label",
+                props: {
+                  id: "menu_label",
+                  font: $font(10)
+                },
+                layout: function (make, view) {
+                  var preView = view.prev;
+                  make.centerX.equalTo(preView);
+                  make.bottom.inset(5);
+                }
+              }
+            ]
+          }
+        ],
+        data: [
+          {
+            menu_image: {
+              symbol: mIconSymbols[0],
+              tintColor: $color("gray")
+            },
+            menu_label: {
+              text: "应用",
+              textColor: $color("gray")
+            }
+          },
+          {
+            menu_image: {
+              symbol: mIconSymbols[1],
+              tintColor: $color("gray")
+            },
+            menu_label: {
+              text: "更新",
+              textColor: $color("gray")
+            }
+          },
+          {
+            menu_image: {
+              symbol: mIconSymbols[2],
+              tintColor: $color("gray")
+            },
+            menu_label: {
+              text: "我的",
+              textColor: $color("gray")
+            }
+          }
+        ]
+      },
+      layout: function (make, view) {
+        make.bottom.inset(0);
+        if ($device.info.screen.width > 500) {
+          make.width.equalTo(500);
+        } else {
+          //make.left.right.inset(0);
+        }
+        make.centerX.equalTo(view.super);
+        make.height.equalTo(50);
+      },
+      events: {
+        didSelect(sender, indexPath, data) {
+          $console.info(indexPath.row);
+        }
+      }
+    };
+  }
+}
+class PageView {
+  constructor() {}
+  genLoadingView(opi) {
+    const { id = "loadingPage", text = "正在载入..." } = opi || {
+      id: "loadingPage",
+      text: "正在载入..."
+    };
+    return {
+      type: "view",
+      props: {
+        id: id ? id : ""
+      },
+      layout: function (make, view) {
+        make.center.equalTo(view.super);
+        make.size.equalTo($size(40, 40));
+      },
+      views: [
+        {
+          type: "spinner",
+          props: {
+            loading: true,
+            style: 2,
+            bgcolor: $color("clear")
+          },
+          layout: function (make, view) {
+            make.top.inset(0);
+            make.centerX.equalTo(view.super);
+          }
+        },
+        {
+          type: "label",
+          props: {
+            text: text,
+            align: $align.center,
+            font: $font(12),
+            textColor: $color("darkGray")
+          },
+          layout: function (make, view) {
+            make.centerX.equalTo(view.super);
+            make.bottom.inset(0);
+          }
+        }
+      ]
+    };
+  }
+}
 class ViewKit {
   constructor() {}
   showView(viewData) {
     $ui.window === undefined ? $ui.render(viewData) : $ui.push(viewData);
   }
 }
-module.exports = { ImageView, ListView };
+module.exports = {
+  ImageView,
+  ListView,
+  NavView,
+  PageView,
+  ViewKit
+};
