@@ -1,5 +1,6 @@
 const { ListView, NavView, ViewKit } = require("../util/View");
 const HistoryView = require("./history.view");
+const VipView=require("./vip.view")
 class MainView {
   constructor() {
     this.ListView = new ListView();
@@ -27,6 +28,42 @@ class MainView {
         "square.and.arrow.down.fill",
         "person.fill"
       ];
+      const navList = [
+          {
+            title: "主页",
+            icon: "square.grid.2x2.fill",
+            func: () => {}
+          },
+          {
+            title: "大会员",
+            icon: "person.icloud",
+            func: () => {
+//              if(true){
+//                $ui.warning("大会员功能开发中")
+//              }else{
+//                $ui.error("你不是大会员")
+//              }
+new VipView().init()
+            }
+          },
+          {
+            title: "我的",
+            icon: "person.fill",
+            func: () => {}
+          }
+        ],
+        navData = navList.map(item => {
+          return {
+            menu_image: {
+              symbol: item.icon,
+              tintColor: $color("gray")
+            },
+            menu_label: {
+              text: item.title,
+              textColor: $color("gray")
+            }
+          };
+        });
       const ViewData = [
         {
           type: "list",
@@ -83,7 +120,7 @@ class MainView {
                 ]
               }
             ],
-            data: [
+            data: navData || [
               {
                 menu_image: {
                   symbol: mIconSymbols[0],
@@ -96,11 +133,11 @@ class MainView {
               },
               {
                 menu_image: {
-                  symbol: mIconSymbols[1],
+                  symbol: "person.icloud",
                   tintColor: $color("gray")
                 },
                 menu_label: {
-                  text: "更新",
+                  text: "大会员",
                   textColor: $color("gray")
                 }
               },
@@ -128,7 +165,19 @@ class MainView {
           },
           events: {
             didSelect(sender, indexPath, data) {
-              $console.info(indexPath.row);
+              const navItem = navList[indexPath.row];
+              if (
+                navItem.func !== undefined &&
+                typeof navItem.func === "function"
+              ) {
+                try {
+                  navItem.func();
+                } catch (error) {
+                  $console.error(error);
+                }
+              } else {
+                $console.info(indexPath.row);
+              }
             }
           }
         }
