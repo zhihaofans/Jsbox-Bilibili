@@ -11,26 +11,23 @@ class VideoList {
         //      $console.info({
         //        thisVideo
         //      });
-        let itemTitle = `${thisVideo.author_mid}@${thisVideo.author_name}`,
-          rows = [];
+        let authorTitle = "";
         switch (thisVideo.business) {
           case "pgc":
-            itemTitle = thisVideo.badge;
-            rows = [`《${thisVideo.title}》`, thisVideo.show_title];
-            break;
-          case "article":
-            rows = [`article.${thisVideo.kid}[专栏文章]`, thisVideo.title];
-
+            authorTitle = thisVideo.show_title;
             break;
           default:
-            rows = [`${thisVideo.bvid}`, thisVideo.title];
+            authorTitle = "@" + thisVideo.author_name;
+        }
+        if (thisVideo.badge) {
+          authorTitle += `\n[${thisVideo.badge}]`;
         }
         return {
           labelTitle: {
             text: thisVideo.title
           },
           labelAuthor: {
-            text: "@" + thisVideo.author_name
+            text: authorTitle
           },
           imageCover: {
             src: thisVideo.cover_image
@@ -38,8 +35,10 @@ class VideoList {
         };
       }),
       didSelect = (section, row) => {
-        const videoItem = videoList[section];
-        $console.info(videoItem);
+        const videoItem = videoList[row];
+        $console.info({
+          videoItem
+        });
         if (isHistory === true) {
           switch (videoItem.business) {
             case "pgc":
