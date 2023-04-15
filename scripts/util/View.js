@@ -197,7 +197,7 @@ class NavView {
         template: [
           {
             type: "view",
-            layout: function (make, view) {
+            layout: (make, view) => {
               make.size.equalTo(view.super);
               make.center.equalTo(view.super);
             },
@@ -209,7 +209,7 @@ class NavView {
                   resizable: true,
                   clipsToBounds: false
                 },
-                layout: function (make, view) {
+                layout: (make, view) => {
                   make.centerX.equalTo(view.super);
                   make.size.equalTo($size(25, 25));
                   make.top.inset(6);
@@ -221,7 +221,7 @@ class NavView {
                   id: "menu_label",
                   font: $font(10)
                 },
-                layout: function (make, view) {
+                layout: (make, view) => {
                   var preView = view.prev;
                   make.centerX.equalTo(preView);
                   make.bottom.inset(5);
@@ -263,7 +263,7 @@ class NavView {
           }
         ]
       },
-      layout: function (make, view) {
+      layout: (make, view) => {
         make.bottom.inset(0);
         if ($device.info.screen.width > 500) {
           make.width.equalTo(500);
@@ -305,7 +305,7 @@ class PageView {
             style: 2,
             bgcolor: $color("clear")
           },
-          layout: function (make, view) {
+          layout: (make, view) => {
             make.top.inset(0);
             make.centerX.equalTo(view.super);
           }
@@ -318,13 +318,159 @@ class PageView {
             font: $font(12),
             textColor: $color("darkGray")
           },
-          layout: function (make, view) {
+          layout: (make, view) => {
             make.centerX.equalTo(view.super);
             make.bottom.inset(0);
           }
         }
       ]
     };
+  }
+}
+class GridView {
+  constructor() {
+    this.ViewKit = new ViewKit();
+  }
+  showGrid3({ itemList, title, callback = (idx, data) => {} }) {
+    const mIconSymbols = [
+      "square.grid.2x2.fill",
+      "square.and.arrow.down.fill",
+      "person.fill"
+    ];
+    const viewData = {
+      type: "matrix",
+      props: {
+        id: "tab",
+        columns: 3,
+        itemHeight: 90,
+        spacing: 5,
+        scrollEnabled: false,
+        bgcolor: $color("clear"),
+        template: [
+          {
+            type: "view",
+            layout: (make, view) => {
+              make.size.equalTo(view.super);
+              make.center.equalTo(view.super);
+            },
+            views: [
+              {
+                type: "image",
+                props: {
+                  id: "menu_image",
+                  resizable: true,
+                  clipsToBounds: false
+                },
+                layout: (make, view) => {
+                  make.centerX.equalTo(view.super);
+                  make.size.equalTo($size(50, 50));
+                  make.top.inset(6);
+                }
+              },
+              {
+                type: "label",
+                props: {
+                  id: "menu_label",
+                  font: $font(10)
+                },
+                layout: (make, view) => {
+                  var preView = view.prev;
+                  make.centerX.equalTo(preView);
+                  make.bottom.inset(5);
+                }
+              }
+            ]
+          }
+        ],
+        data: itemList
+          ? itemList.map(item => {
+              return {
+                menu_image: {
+                  symbol: item.icon,
+                  tintColor: $color("gray")
+                },
+                menu_label: {
+                  text: item.title,
+                  textColor: $color("gray")
+                }
+              };
+            })
+          : [
+              {
+                menu_image: {
+                  symbol: mIconSymbols[0],
+                  tintColor: $color("gray")
+                },
+                menu_label: {
+                  text: "应用",
+                  textColor: $color("gray")
+                }
+              },
+              {
+                menu_image: {
+                  symbol: mIconSymbols[1],
+                  tintColor: $color("gray")
+                },
+                menu_label: {
+                  text: "更新",
+                  textColor: $color("gray")
+                }
+              },
+              {
+                menu_image: {
+                  symbol: mIconSymbols[2],
+                  tintColor: $color("gray")
+                },
+                menu_label: {
+                  text: "我的",
+                  textColor: $color("gray")
+                }
+              },
+              {
+                menu_image: {
+                  symbol: mIconSymbols[0],
+                  tintColor: $color("gray")
+                },
+                menu_label: {
+                  text: "应用",
+                  textColor: $color("gray")
+                }
+              },
+              {
+                menu_image: {
+                  symbol: mIconSymbols[1],
+                  tintColor: $color("gray")
+                },
+                menu_label: {
+                  text: "更新",
+                  textColor: $color("gray")
+                }
+              },
+              {
+                menu_image: {
+                  symbol: mIconSymbols[2],
+                  tintColor: $color("gray")
+                },
+                menu_label: {
+                  text: "我的",
+                  textColor: $color("gray")
+                }
+              }
+            ]
+      },
+      layout: $layout.fill,
+      events: {
+        didSelect(sender, indexPath, data) {
+          callback ? callback(indexPath.row, data) : undefined;
+        }
+      }
+    };
+    this.ViewKit.showView({
+      props: {
+        title
+      },
+      views: [viewData]
+    });
   }
 }
 class ViewKit {
@@ -334,6 +480,7 @@ class ViewKit {
   }
 }
 module.exports = {
+  GridView,
   ImageView,
   ListView,
   NavView,
