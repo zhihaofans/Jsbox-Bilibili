@@ -1,6 +1,6 @@
 const { HttpService, HttpUtil } = require("./http.service");
 const httpService = new HttpService();
-const { getCookie } = require("./user.service");
+const { getCookie } = require("./account.service");
 const { hasString } = require("../util/String");
 class ExampleService {
   constructor() {}

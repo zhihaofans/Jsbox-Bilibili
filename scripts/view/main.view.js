@@ -1,6 +1,7 @@
 const { ListView, NavView, ViewKit } = require("../util/View");
 const HistoryView = require("./history.view");
-const VipView=require("./vip.view")
+const VipView = require("./vip.view");
+const { showErrorAlertAndExit } = require("../util/JSBox");
 class MainView {
   constructor() {
     this.ListView = new ListView();
@@ -30,20 +31,16 @@ class MainView {
       ];
       const navList = [
           {
-            title: "主页",
-            icon: "square.grid.2x2.fill",
+            title: "浏览",
+            icon: "eyeglasses",
+            selected: true,
             func: () => {}
           },
           {
             title: "大会员",
             icon: "person.icloud",
             func: () => {
-//              if(true){
-//                $ui.warning("大会员功能开发中")
-//              }else{
-//                $ui.error("你不是大会员")
-//              }
-new VipView().init()
+              new VipView().init();
             }
           },
           {
@@ -54,13 +51,16 @@ new VipView().init()
         ],
         navData = navList.map(item => {
           return {
+            view_item: {
+              bgcolor: item.selected ? $color("gray") : undefined
+            },
             menu_image: {
               symbol: item.icon,
-              tintColor: $color("gray")
+              tintColor: item.selected ? $color("white") : $color("gray")
             },
             menu_label: {
               text: item.title,
-              textColor: $color("gray")
+              textColor: item.selected ? $color("white") : $color("gray")
             }
           };
         });
@@ -87,6 +87,9 @@ new VipView().init()
             template: [
               {
                 type: "view",
+                props: {
+                  id: "view_item"
+                },
                 layout: function (make, view) {
                   make.size.equalTo(view.super);
                   make.center.equalTo(view.super);
@@ -174,6 +177,7 @@ new VipView().init()
                   navItem.func();
                 } catch (error) {
                   $console.error(error);
+                  showErrorAlertAndExit(error.message);
                 }
               } else {
                 $console.info(indexPath.row);
@@ -199,6 +203,7 @@ new VipView().init()
       });
     } catch (error) {
       $console.error(error);
+      showErrorAlertAndExit(error.message);
     }
   }
 }

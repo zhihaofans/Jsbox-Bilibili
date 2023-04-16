@@ -73,11 +73,11 @@ class UserService {
         this.UserInfo.getNavData(true).then(
           result => {
             $console.info("checkLoginStatus.then");
-            if(result===undefined){
+            if (result === undefined) {
               reject({
-                message:"result===undefined"
-              })
-            }else if (result.code !== 0) {
+                message: "result===undefined"
+              });
+            } else if (result.code !== 0) {
               //this.userData.clearAllData();
             }
             resolve(result.code === 0);

@@ -146,7 +146,7 @@ class LoginView {
           });
           if (code === 0) {
             sender.title = "登录成功";
-            sender.bgcolor = $color("green")
+            sender.bgcolor = $color("green");
           } else {
             sender.enabled = true;
             sender.title = "还没登录呢";
