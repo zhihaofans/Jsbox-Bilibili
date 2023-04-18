@@ -20,10 +20,18 @@ class UserDataService {
     return this.Keychain.get(this.Key.cookie);
   }
   setCookie(cookie) {
+    if (cookie === undefined || cookie.length == 0) {
+      return false;
+    }
     const httpUtil = new HttpUtil();
     const resultCookie = this.Keychain.set(this.Key.cookie, cookie);
     const cookieObj = httpUtil.getCookieObject(cookie);
-    const resultCsrf = this.setCsrf(cookieObj.bili_jct);
+    const csrf = httpUtil.queryCookieByCookieStr(cookie, "bili_jct");
+    $console.info({
+      cookieObj,
+      csrf
+    });
+    const resultCsrf = this.setCsrf(cookieObj?.bili_jct || csrf);
     return resultCookie && resultCsrf;
   }
   getCsrf() {
@@ -38,6 +46,7 @@ class UserDataService {
   setAccesskey(accesskey) {
     return this.Keychain.set(this.Key.accesskey, accesskey);
   }
+  checkCsrf() {}
 }
 class LoginService {
   constructor() {
@@ -185,6 +194,12 @@ class AccountService {
   }
   logout() {
     this.LoginService.logout();
+  }
+  importCookieAndCsrf(cookie, csrf) {
+    return (
+      this.UserDataService.setCookie(cookie) &&
+      this.UserDataService.setCsrf(csrf)
+    );
   }
 }
 module.exports = AccountService;

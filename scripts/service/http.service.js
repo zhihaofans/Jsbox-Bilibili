@@ -39,6 +39,9 @@ class HttpUtil {
       return undefined;
     }
   }
+  queryCookieByCookieStr(cookieStr, name) {
+    return `; ${cookieStr}`.split(`; ${name}=`).pop().split(";").shift();
+  }
 }
 class HttpService {
   constructor() {
@@ -122,6 +125,13 @@ class HttpService {
     return $http.get({
       url: this.concatUrlParams(url, params),
       header
+    });
+  }
+  postThen({ url, params, header, body }) {
+    return $http.post({
+      url: this.concatUrlParams(url, params),
+      header,
+      body
     });
   }
   addParamsToUrl(params) {

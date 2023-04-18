@@ -37,7 +37,7 @@ class LoginView {
   }
   login() {
     return new Promise((resolve, reject) => {
-      const listItem = ["扫码登录", "test input"],
+      const listItem = ["扫码登录", "输入登录数据"],
         didSelect = index => {
           switch (index) {
             case 0:
@@ -69,6 +69,11 @@ class LoginView {
                     cookie,
                     csrf
                   });
+                  const importResult = this.AccountService.importCookieAndCsrf(
+                    cookie,
+                    csrf
+                  );
+                  importResult ? $ui.success("ok") : $ui.error("error");
                 })
                 .catch(fail => {
                   $console.error(fail);

@@ -12,18 +12,25 @@ class VipPage {
         {
           title: "领取权益",
           icon: "gift.fill"
+        },
+        {
+          title: "大积分签到",
+          icon: "checkmark.rectangle"
         }
       ];
       new GridView().showGrid3({
         title: "大会员",
         itemList,
         callback: (idx, data) => {
-          $console.info(idx, data);
           switch (idx) {
             case 0:
               this.showVipPrivilege();
               break;
+            case 1:
+              this.showVipPoint();
+              break;
             default:
+              $ui.warning("开发中");
           }
         }
       });
@@ -33,28 +40,35 @@ class VipPage {
     }
   }
   showVipPrivilege() {
+    $ui.loading(true)
     const itemStr = [
       "",
       "B币券",
       "会员购优惠券",
       "漫画福利券",
       "会员购包邮券",
-      "漫画商城优惠券"
+      "漫画商城优惠券",
+      "课堂优惠券",
+      "课堂优惠券"
     ];
     this.VipService.VipPrivilege.getPrivilegeStatus()
       .then(result => {
-        $console.info(result);
         if (result.code === 0) {
           const itemList = result.data.list;
+          $ui.loading(false)
           $ui.push({
             props: {
-              title: "listview"
+              title: "大会员权益"
             },
             views: [
               {
                 type: "list",
                 props: {
-                  data: itemList.map(item => itemStr[item.type])
+                  data: itemList.map(item => {
+                    const title = itemStr[item.type] || "未知",
+                      status = item.state === 0 ? "未兑换" : "已兑换";
+                    return title + `[${status}]`;
+                  })
                 },
                 layout: $layout.fill,
                 events: {
@@ -104,8 +118,21 @@ class VipPage {
         }
       })
       .catch(error => {
+        $ui.loading(false)
         $console.error(error);
         showErrorAlertAndExit(error.message);
+      });
+  }
+  showVipPoint() {
+    $ui.loading(true)
+    this.VipService.Task.bigPointCheckIn()
+      .then(result => {
+        $ui.loading(false);
+        $console.info(result);
+      })
+      .catch(fail => {
+        $ui.loading(false);
+        $console.error(fail);
       });
   }
 }
@@ -119,7 +146,6 @@ class VipView {
         .then(isVip => {
           if (isVip) {
             $ui.pop();
-            //$ui.success("🙆");
             this.VipService.getVipCenterInfo()
               .then(data => {
                 new VipPage(this.VipService, data).init();
@@ -159,7 +185,7 @@ class VipView {
           }
         })
         .catch(error => {
-          $console.info(error);
+          $console.error(error);
         });
     });
   }
