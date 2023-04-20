@@ -3,6 +3,7 @@ const { LoginView } = require("./view/account.view");
 const MainView = require("./view/main.view");
 const AccountService = require("./service/account.service"),
   UserService = require("./service/user.service");
+const {showErrorAlertAndExit}=require("./util/JSBox")
 class App extends AppKernel {
   constructor() {
     super({
@@ -73,19 +74,7 @@ class App extends AppKernel {
       } catch (error) {
         $ui.loading(false);
         $console.error(error);
-        $ui.alert({
-          title: "发生未知错误",
-          message: "请检查代码",
-          actions: [
-            {
-              title: "OK",
-              disabled: false, // Optional
-              handler: () => {
-                $app.close();
-              }
-            }
-          ]
-        });
+        showErrorAlertAndExit("请检查代码")
       }
     } else {
       //$ui.error("未登录");

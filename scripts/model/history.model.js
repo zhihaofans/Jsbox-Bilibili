@@ -5,7 +5,7 @@ class PublishItemData {
     this.author_name = videoData.owner?.name || videoData.author_name;
     this.avid = videoData.aid || videoData.history?.avid;
     this.badge = videoData.badge;
-    this.business = videoData.history?.business; //历史类型：archive：稿件，pgc：剧集（番剧 / 影视），live：直播，article-list：文集，article：文章
+    this.business = videoData.history?.business || "archive"; //历史类型：archive：稿件，pgc：剧集（番剧 / 影视），live：直播，article-list：文集，article：文章
     this.bvid = videoData.bvid || videoData.history?.bvid;
     this.copyright = videoData.copyright; //1：原创 2：转载
     this.cover_image = videoData.pic || videoData.cover || videoData.covers[0]; //视频封面

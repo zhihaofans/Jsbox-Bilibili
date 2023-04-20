@@ -1,20 +1,19 @@
 const { HttpService } = require("./http.service");
-const BilibiliApi = require("BilibiliApi");
+const AccountService = require("./account.service");
 class UserInfoService {
   constructor() {
     this.HttpService = new HttpService();
-    this.AccountService = require("./account.service");
+    this.AccountService = new AccountService();
   }
   getNavData(rawData = false) {
     return new Promise((resolve, reject) => {
-      const url = "http://api.bilibili.com/x/web-interface/nav",
-        accountService = new this.AccountService();
+      const url = "http://api.bilibili.com/x/web-interface/nav"
       try {
         $console.info("trystart");
         this.HttpService.getCallback({
           url,
           header: {
-            cookie: accountService.getCookie()
+            cookie: this.AccountService.getCookie()
           },
           callback: data => {
             $console.info("trycall");
@@ -34,13 +33,13 @@ class UserInfoService {
     });
   }
   getNavDataOld(callback, rawData = false) {
-    const url = "http://api.bilibili.com/x/web-interface/nav",
-      accountService = new this.AccountService();
+    const url = "http://api.bilibili.com/x/web-interface/nav"
+      
     try {
       this.HttpService.getCallback({
         url,
         header: {
-          cookie: accountService.getCookie()
+          cookie: this.AccountService.getCookie()
         },
         callback: data => {
           if (data === undefined || data.code !== 0) {

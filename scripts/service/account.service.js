@@ -1,7 +1,6 @@
 const { hasString } = require("../util/String");
 const { HttpService, HttpUtil } = require("./http.service");
 const UrlUtil = require("../util/Url");
-const BilibiliApi = require("BilibiliApi");
 class UserDataService {
   constructor() {
     this.Storage = require("../util/Storage");
@@ -51,7 +50,6 @@ class UserDataService {
 class LoginService {
   constructor() {
     this.HttpService = new HttpService();
-    this.Api = new BilibiliApi.AccountLoginApi();
     this.userData = new UserDataService();
   }
   isLogin() {

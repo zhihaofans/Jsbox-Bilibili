@@ -2,6 +2,7 @@ const { PublishItemData } = require("../model/history.model");
 const HistoryService = require("../service/history.service");
 const { ListView } = require("../util/View");
 const AppService = require("../service/app.service");
+const PostDetailView = require("./post.detail.view");
 class VideoList {
   constructor() {
     this.ListView = new ListView();
@@ -98,7 +99,7 @@ class VideoList {
               $console.info(indexPath);
               const selectItem = videoList[indexPath.row];
               $ui.menu({
-                items: ["获取封面"],
+                items: ["获取封面", "获取信息"],
                 handler: (title, idx) => {
                   switch (idx) {
                     case 0:
@@ -106,6 +107,13 @@ class VideoList {
                         title: "稿件封面图",
                         url: selectItem.cover_image
                       });
+                      break;
+                    case 1:
+                      if (selectItem.business === "archive") {
+                        new PostDetailView().showVideoDetail(selectItem.bvid);
+                      } else {
+                        $ui.warning("开发中");
+                      }
                       break;
                     default:
                   }
