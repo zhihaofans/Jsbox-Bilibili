@@ -29,7 +29,7 @@ class VideoInfoService {
                 data
               });
               reject(undefined);
-            } else if(data){
+            } else if (data) {
               $console.info({
                 getVideoInfo: videoId,
                 data

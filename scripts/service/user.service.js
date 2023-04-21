@@ -7,7 +7,7 @@ class UserInfoService {
   }
   getNavData(rawData = false) {
     return new Promise((resolve, reject) => {
-      const url = "http://api.bilibili.com/x/web-interface/nav"
+      const url = "http://api.bilibili.com/x/web-interface/nav";
       try {
         $console.info("trystart");
         this.HttpService.getCallback({
@@ -33,8 +33,8 @@ class UserInfoService {
     });
   }
   getNavDataOld(callback, rawData = false) {
-    const url = "http://api.bilibili.com/x/web-interface/nav"
-      
+    const url = "http://api.bilibili.com/x/web-interface/nav";
+
     try {
       this.HttpService.getCallback({
         url,

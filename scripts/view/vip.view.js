@@ -40,7 +40,7 @@ class VipPage {
     }
   }
   showVipPrivilege() {
-    $ui.loading(true)
+    $ui.loading(true);
     const itemStr = [
       "",
       "B币券",
@@ -55,7 +55,7 @@ class VipPage {
       .then(result => {
         if (result.code === 0) {
           const itemList = result.data.list;
-          $ui.loading(false)
+          $ui.loading(false);
           $ui.push({
             props: {
               title: "大会员权益"
@@ -118,13 +118,13 @@ class VipPage {
         }
       })
       .catch(error => {
-        $ui.loading(false)
+        $ui.loading(false);
         $console.error(error);
         showErrorAlertAndExit(error.message);
       });
   }
   showVipPoint() {
-    $ui.loading(true)
+    $ui.loading(true);
     this.VipService.Task.bigPointCheckIn()
       .then(result => {
         $ui.loading(false);
