@@ -2,6 +2,7 @@ const { ListView, NavView, ViewKit } = require("../util/View");
 const HistoryView = require("./history.view");
 const VipView = require("./vip.view");
 const { showErrorAlertAndExit } = require("../util/JSBox");
+const COLOR = require("../config/color");
 class MainView {
   constructor() {
     this.ListView = new ListView();
@@ -32,7 +33,7 @@ class MainView {
       const navList = [
           {
             title: "浏览",
-            icon: "eyeglasses",
+            icon: "tv.fill",
             selected: true,
             func: () => {}
           },
@@ -51,16 +52,17 @@ class MainView {
         ],
         navData = navList.map(item => {
           return {
-            view_item: {
-              bgcolor: item.selected ? $color("gray") : undefined
-            },
             menu_image: {
               symbol: item.icon,
-              tintColor: item.selected ? $color("white") : $color("gray")
+              tintColor: item.selected
+                ? COLOR.navSelectedIconColor
+                : COLOR.navIconColor
             },
             menu_label: {
               text: item.title,
-              textColor: item.selected ? $color("white") : $color("gray")
+              textColor: item.selected
+                ? COLOR.navSelectedTextColor
+                : COLOR.navTextColor
             }
           };
         });
@@ -83,7 +85,7 @@ class MainView {
             itemHeight: 50,
             spacing: 0,
             scrollEnabled: false,
-            bgcolor: $color("clear"),
+            //bgcolor: $color("clear"),
             template: [
               {
                 type: "view",
