@@ -1,8 +1,10 @@
-const { HttpService } = require("./http.service");
+const Http = require("./http.service");
+const HttpService = new Http.HttpService();
 const AccountService = require("./account.service");
+const accountService = new AccountService();
+const cookie = accountService.getCookie();
 class UserInfoService {
   constructor() {
-    this.HttpService = new HttpService();
     this.AccountService = new AccountService();
   }
   getNavData(rawData = false) {
@@ -10,21 +12,18 @@ class UserInfoService {
       const url = "http://api.bilibili.com/x/web-interface/nav";
       try {
         $console.info("trystart");
-        this.HttpService.getCallback({
+        HttpService.getThen({
           url,
           header: {
-            cookie: this.AccountService.getCookie()
-          },
-          callback: data => {
-            $console.info("trycall");
-            if (data === undefined || data.code !== 0) {
-              resolve(rawData === true ? data : undefined);
-            } else {
-              resolve(rawData === true ? data : data.data);
-            }
-            $console.info("trycallend");
+            cookie
           }
-        });
+        })
+          .then(data => {
+            $console.info("trycall");
+            resolve(rawData === true ? data : data?.data);
+            $console.info("trycallend");
+          })
+          .catch(fail => reject(fail));
         $console.info("try");
       } catch (error) {
         $console.error(error);
@@ -34,12 +33,11 @@ class UserInfoService {
   }
   getNavDataOld(callback, rawData = false) {
     const url = "http://api.bilibili.com/x/web-interface/nav";
-
     try {
-      this.HttpService.getCallback({
+      HttpService.getCallback({
         url,
         header: {
-          cookie: this.AccountService.getCookie()
+          cookie
         },
         callback: data => {
           if (data === undefined || data.code !== 0) {
@@ -62,38 +60,63 @@ class UserInfoService {
     }
   }
 }
-class UserService {
-  constructor() {
-    this.UserInfo = new UserInfoService();
-  }
-  checkLoginStatus() {
-    return new Promise((resolve, reject) => {
-      try {
-        this.UserInfo.getNavData(true).then(
-          result => {
-            $console.info("checkLoginStatus.then");
-            if (result === undefined) {
-              reject({
-                message: "result===undefined"
-              });
-            } else if (result.code !== 0) {
-              //this.userData.clearAllData();
-            }
-            resolve(result.code === 0);
-            $console.info("checkLoginStatus.end");
-          },
-          fail => {
-            $console.error({
-              UserServicecheckLoginStatus: fail
+
+const UserInfo = new UserInfoService();
+function checkLoginStatus() {
+  return new Promise((resolve, reject) => {
+    try {
+      UserInfo.getNavData().then(
+        result => {
+          $console.info("checkLoginStatus.then");
+          if (result === undefined) {
+            reject({
+              message: "result===undefined"
             });
-            reject(fail);
+          } else if (result.code !== 0) {
+            // 如果未登录则自动清空登录数据
+            //this.userData.clearAllData();
           }
-        );
-      } catch (error) {
-        $console.error(error);
-        reject(error);
-      }
-    });
-  }
+          resolve(result.code === 0);
+          $console.info("checkLoginStatus.end");
+        },
+        fail => {
+          $console.error({
+            UserServicecheckLoginStatus: fail
+          });
+          reject(fail);
+        }
+      );
+    } catch (error) {
+      $console.error(error);
+      reject(error);
+    }
+  });
 }
-module.exports = UserService;
+function getNavData(rawData = false) {
+  return new Promise((resolve, reject) => {
+    const url = "http://api.bilibili.com/x/web-interface/nav";
+    try {
+      $console.info("trystart");
+      this.HttpService.getThen({
+        url,
+        header: {
+          cookie
+        }
+      })
+        .then(data => {
+          $console.info("trycall");
+          resolve(rawData === true ? data : data?.data);
+          $console.info("trycallend");
+        })
+        .catch(fail => reject(fail));
+      $console.info("try");
+    } catch (error) {
+      $console.error(error);
+      reject(error);
+    }
+  });
+}
+module.exports = {
+  checkLoginStatus,
+  getNavData
+};
