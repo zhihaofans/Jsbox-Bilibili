@@ -1,48 +1,3 @@
-class HttpUtil {
-  constructor() {}
-  addParamsToUrl(params) {
-    //const params = {aaa: "aaa"};
-    const keys = Object.keys(params);
-    if (keys.length === 0) {
-      return "";
-    }
-    let paramsStr = "?";
-    keys.map(key => {
-      if (paramsStr != "?") {
-        paramsStr += "&";
-      }
-      paramsStr += key + "=" + $text.URLEncode(params[key]);
-    });
-    return paramsStr;
-  }
-  concatUrlParams(url, params) {
-    let newUrl = url;
-    if (params != undefined && Object.keys(params).length > 0) {
-      if (url.includes("?")) {
-        newUrl = url.substring(0, url.indexOf("?"));
-      }
-      newUrl += this.addParamsToUrl(params);
-    }
-    return newUrl;
-  }
-  getCookieObject(cookie) {
-    if (cookie) {
-      const cookieResult = {};
-      cookie.split(";").map(cookieItem => {
-        const itemSplit = cookieItem.trim().split("="),
-          itemKey = itemSplit[0],
-          itemValve = itemSplit[1];
-        cookieResult[itemKey] = itemValve;
-      });
-      return cookieResult;
-    } else {
-      return undefined;
-    }
-  }
-  queryCookieByCookieStr(cookieStr, name) {
-    return `; ${cookieStr}`.split(`; ${name}=`).pop().split(";").shift();
-  }
-}
 class HttpService {
   constructor() {
     this.TIMEOUT = 5;
@@ -51,7 +6,7 @@ class HttpService {
     this.TIMEOUT = number || 5;
   }
   async get({ url, header, params }) {
-    const newUrl = this.concatUrlParams(url, params);
+    const newUrl = concatUrlParams(url, params);
     return await $http.get({
       url: newUrl,
       timeout: this.TIMEOUT,
@@ -60,7 +15,7 @@ class HttpService {
   }
   async post({ url, header, body, params }) {
     return await $http.post({
-      url: this.concatUrlParams(url, params),
+      url: concatUrlParams(url, params),
       header,
       timeout: this.TIMEOUT,
       body
@@ -75,7 +30,7 @@ class HttpService {
     }
   }) {
     $http.get({
-      url: this.concatUrlParams(url, params),
+      url: concatUrlParams(url, params),
       params,
       header,
       timeout: this.TIMEOUT,
@@ -92,7 +47,7 @@ class HttpService {
     }
   }) {
     $http.post({
-      url: this.concatUrlParams(url, params),
+      url: concatUrlParams(url, params),
       header,
       body,
       timeout: this.TIMEOUT,
@@ -101,7 +56,7 @@ class HttpService {
   }
   getCallback({ url, params, header, callback }) {
     $http.get({
-      url: this.concatUrlParams(url, params),
+      url: concatUrlParams(url, params),
       params,
       header,
       timeout: this.TIMEOUT,
@@ -112,7 +67,7 @@ class HttpService {
   }
   postCallback({ url, params, body, header, callback }) {
     $http.post({
-      url: this.concatUrlParams(url, params),
+      url: concatUrlParams(url, params),
       header,
       body,
       timeout: this.TIMEOUT,
@@ -123,68 +78,75 @@ class HttpService {
   }
   getThen({ url, params, header }) {
     return $http.get({
-      url: this.concatUrlParams(url, params),
+      url: concatUrlParams(url, params),
       header
     });
   }
   postThen({ url, params, header, body }) {
     return $http.post({
-      url: this.concatUrlParams(url, params),
+      url: concatUrlParams(url, params),
       header,
       body
     });
   }
-  addParamsToUrl(params) {
-    //const params = {aaa: "aaa"};
-    const keys = Object.keys(params);
-    if (keys.length === 0) {
-      return "";
+}
+function addParamsToUrl(params) {
+  //const params = {aaa: "aaa"};
+  const keys = Object.keys(params);
+  if (keys.length === 0) {
+    return "";
+  }
+  let paramsStr = "?";
+  keys.map(key => {
+    if (paramsStr != "?") {
+      paramsStr += "&";
     }
-    let paramsStr = "?";
-    keys.map(key => {
-      if (paramsStr != "?") {
-        paramsStr += "&";
-      }
-      paramsStr += key + "=" + $text.URLEncode(params[key]);
+    paramsStr += key + "=" + $text.URLEncode(params[key]);
+  });
+  return paramsStr;
+}
+function concatUrlParams(url, params) {
+  let newUrl = url;
+  if (params != undefined && Object.keys(params).length > 0) {
+    if (url.includes("?")) {
+      newUrl = url.substring(0, url.indexOf("?"));
+    }
+    newUrl += addParamsToUrl(params);
+  }
+  return newUrl;
+}
+function getCookieObject(cookie) {
+  if (cookie) {
+    const cookieResult = {};
+    cookie.split(";").map(cookieItem => {
+      const itemSplit = cookieItem.trim().split("="),
+        itemKey = itemSplit[0],
+        itemValve = itemSplit[1];
+      cookieResult[itemKey] = itemValve;
     });
-    return paramsStr;
-  }
-  concatUrlParams(url, params) {
-    let newUrl = url;
-    if (params != undefined && Object.keys(params).length > 0) {
-      if (url.includes("?")) {
-        newUrl = url.substring(0, url.indexOf("?"));
-      }
-      newUrl += this.addParamsToUrl(params);
-    }
-    return newUrl;
-  }
-  getCookieObject(cookie) {
-    if (cookie) {
-      const cookieResult = {};
-      cookie.split(";").map(cookieItem => {
-        const itemSplit = cookieItem.trim().split("="),
-          itemKey = itemSplit[0],
-          itemValve = itemSplit[1];
-        cookieResult[itemKey] = itemValve;
-      });
-      return cookieResult;
-    } else {
-      return undefined;
-    }
-  }
-  getParamsFromUrl(URL) {
-    return JSON.parse(
-      '{"' +
-        decodeURI(URL.split("?")[1])
-          .replace(/"/g, '\\"')
-          .replace(/&/g, '","')
-          .replace(/=/g, '":"') +
-        '"}'
-    );
+    return cookieResult;
+  } else {
+    return undefined;
   }
 }
+function getParamsFromUrl(URL) {
+  return JSON.parse(
+    '{"' +
+      decodeURI(URL.split("?")[1])
+        .replace(/"/g, '\\"')
+        .replace(/&/g, '","')
+        .replace(/=/g, '":"') +
+      '"}'
+  );
+}
+function queryCookieByCookieStr(cookieStr, name) {
+  return `; ${cookieStr}`.split(`; ${name}=`).pop().split(";").shift();
+}
 module.exports = {
-  HttpService,
-  HttpUtil
+  addParamsToUrl,
+  concatUrlParams,
+  getCookieObject,
+  getParamsFromUrl,
+  queryCookieByCookieStr,
+  HttpService
 };
