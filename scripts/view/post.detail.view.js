@@ -21,12 +21,13 @@ class PostDetailView {
                 type: "image",
                 props: {
                   id: "imageCover",
+                  scale: 9 / 16,
                   src: videoInfo.pic
                 },
                 layout: (make, view) => {
-                  make.left.top.equalTo(0);
-                  make.width.equalTo(view.width);
-                  $console.info(view.width);
+                  make.left.top.right.equalTo(0);
+                  //make.width.equalTo(view.width);
+                  $console.info(make.width);
                   //make.height.equalTo(view.width/16*9);
                 }
               }

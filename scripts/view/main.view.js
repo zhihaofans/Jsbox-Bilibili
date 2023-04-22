@@ -47,7 +47,9 @@ class MainView {
           {
             title: "我的",
             icon: "person.fill",
-            func: () => {}
+            func: () => {
+              require("./aboutme.view").init();
+            }
           }
         ],
         navData = navList.map(item => {

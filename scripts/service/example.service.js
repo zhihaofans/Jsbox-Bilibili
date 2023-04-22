@@ -1,11 +1,11 @@
-const { HttpService, HttpUtil } = require("./http.service");
+const { HttpService } = require("./http.service");
 const httpService = new HttpService();
 const { getCookie } = require("./account.service");
 const { hasString } = require("../util/String");
 class ExampleService {
   constructor() {}
   test() {
-    return Promise.resolve();
+    return new Promise((resolve, reject) => {});
   }
 }
 class HttpExampleService {

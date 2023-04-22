@@ -331,21 +331,23 @@ class GridView {
   constructor() {
     this.ViewKit = new ViewKit();
   }
-  showGrid3({ itemList, title, callback = (idx, data) => {} }) {
-    const mIconSymbols = [
-      "square.grid.2x2.fill",
-      "square.and.arrow.down.fill",
-      "person.fill"
-    ];
+  getGridData({
+    itemList,
+    title,
+    columns,
+    callback = (idx, data) => {},
+    itemHeight,
+    spacing,
+    itemColor
+  }) {
     const viewData = {
       type: "matrix",
       props: {
         id: "tab",
-        columns: 3,
-        itemHeight: 90,
-        spacing: 5,
+        columns: columns || 3,
+        itemHeight: itemHeight || 90,
+        spacing: spacing || 5,
         scrollEnabled: false,
-        bgcolor: $color("clear"),
         template: [
           {
             type: "view",
@@ -382,81 +384,18 @@ class GridView {
             ]
           }
         ],
-        data: itemList
-          ? itemList.map(item => {
-              return {
-                menu_image: {
-                  symbol: item.icon,
-                  tintColor: $color("gray")
-                },
-                menu_label: {
-                  text: item.title,
-                  textColor: $color("gray")
-                }
-              };
-            })
-          : [
-              {
-                menu_image: {
-                  symbol: mIconSymbols[0],
-                  tintColor: $color("gray")
-                },
-                menu_label: {
-                  text: "应用",
-                  textColor: $color("gray")
-                }
-              },
-              {
-                menu_image: {
-                  symbol: mIconSymbols[1],
-                  tintColor: $color("gray")
-                },
-                menu_label: {
-                  text: "更新",
-                  textColor: $color("gray")
-                }
-              },
-              {
-                menu_image: {
-                  symbol: mIconSymbols[2],
-                  tintColor: $color("gray")
-                },
-                menu_label: {
-                  text: "我的",
-                  textColor: $color("gray")
-                }
-              },
-              {
-                menu_image: {
-                  symbol: mIconSymbols[0],
-                  tintColor: $color("gray")
-                },
-                menu_label: {
-                  text: "应用",
-                  textColor: $color("gray")
-                }
-              },
-              {
-                menu_image: {
-                  symbol: mIconSymbols[1],
-                  tintColor: $color("gray")
-                },
-                menu_label: {
-                  text: "更新",
-                  textColor: $color("gray")
-                }
-              },
-              {
-                menu_image: {
-                  symbol: mIconSymbols[2],
-                  tintColor: $color("gray")
-                },
-                menu_label: {
-                  text: "我的",
-                  textColor: $color("gray")
-                }
-              }
-            ]
+        data: itemList.map(item => {
+          return {
+            menu_image: {
+              symbol: item.icon,
+              tintColor: itemColor || $color("gray")
+            },
+            menu_label: {
+              text: item.title,
+              textColor: itemColor || $color("gray")
+            }
+          };
+        })
       },
       layout: $layout.fill,
       events: {
@@ -465,6 +404,12 @@ class GridView {
         }
       }
     };
+    return viewData;
+  }
+  showGrid3({ itemList, title, callback = (idx, data) => {} }) {
+    const viewData = this.getGridData({
+      itemList
+    });
     this.ViewKit.showView({
       props: {
         title

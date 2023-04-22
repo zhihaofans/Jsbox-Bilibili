@@ -1,5 +1,9 @@
 const { hasString } = require("../util/String");
-const { HttpService, HttpUtil } = require("./http.service");
+const {
+  HttpService,
+  getCookieObject,
+  queryCookieByCookieStr
+} = require("./http.service");
 const UrlUtil = require("../util/Url");
 class UserDataService {
   constructor() {
@@ -22,10 +26,9 @@ class UserDataService {
     if (cookie === undefined || cookie.length == 0) {
       return false;
     }
-    const httpUtil = new HttpUtil();
     const resultCookie = this.Keychain.set(this.Key.cookie, cookie);
-    const cookieObj = httpUtil.getCookieObject(cookie);
-    const csrf = httpUtil.queryCookieByCookieStr(cookie, "bili_jct");
+    const cookieObj = getCookieObject(cookie);
+    const csrf = queryCookieByCookieStr(cookie, "bili_jct");
     $console.info({
       cookieObj,
       csrf
@@ -136,7 +139,7 @@ class LoginService {
 
           $console.info(resp.response.headers);
           if (result.code === 0) {
-            const { code, refresh_token, url, timestamp } = result.data;
+            const { code, url } = result.data;
             if (code === 0) {
               const urlPar = UrlUtil.getParameters(url),
                 Cookies = resp.response.headers["Set-Cookie"];

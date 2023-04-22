@@ -15,14 +15,12 @@ class App extends AppKernel {
   }
   init() {
     $ui.loading("正在初始化...");
-    const accountService = new AccountService(),
-      userService = new UserService();
+    const accountService = new AccountService();
     const mainView = new MainView();
     if (accountService.isLogin()) {
       //$ui.success("登录成功");
       try {
-        userService
-          .checkLoginStatus()
+        UserService.checkLoginStatus()
           .then(
             result => {
               $ui.loading(false);

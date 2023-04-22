@@ -6,34 +6,8 @@ const AppService = require("../service/app.service");
 class LoginView {
   constructor(app) {
     this.AccountService = new AccountService();
-    this.UserService = new UserService();
     this.ListView = new ListView();
     this.ImageView = new ImageView();
-  }
-  checkLogin() {
-    try {
-      if (this.AccountService.isLogin() === true) {
-      }
-    } catch (error) {
-      $console.error(error);
-      $ui.error("发生程序错误");
-    } finally {
-      $console.info("checkLogin.finish");
-    }
-  }
-  inputKey() {
-    return new Promise((resolve, reject) => {
-      $input.text({
-        type: $kbType.text,
-        placeholder: "",
-        text: "",
-        handler: text => {}
-      });
-      reject({
-        error: false,
-        message: "取消输入登录key"
-      });
-    });
   }
   login() {
     return new Promise((resolve, reject) => {
@@ -45,7 +19,6 @@ class LoginView {
                 this.scanQrcode2Login();
               } catch (error) {
                 $console.error(error);
-              } finally {
               }
               break;
             case 1:
