@@ -139,6 +139,19 @@ function getParamsFromUrl(URL) {
       '"}'
   );
 }
+function getThen({ url, params, header }) {
+  return $http.get({
+    url: concatUrlParams(url, params),
+    header
+  });
+}
+function postThen({ url, params, header, body }) {
+  return $http.post({
+    url: concatUrlParams(url, params),
+    header,
+    body
+  });
+}
 function queryCookieByCookieStr(cookieStr, name) {
   return `; ${cookieStr}`.split(`; ${name}=`).pop().split(";").shift();
 }
@@ -147,6 +160,8 @@ module.exports = {
   concatUrlParams,
   getCookieObject,
   getParamsFromUrl,
+  getThen,
+  postThen,
   queryCookieByCookieStr,
   HttpService
 };
