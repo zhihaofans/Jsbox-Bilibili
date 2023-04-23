@@ -1,9 +1,6 @@
-const AccountService = require("./account.service");
+const { getCookie, getCsrf } = require("./account.service");
 const { HttpService } = require("./http.service");
 const Http = new HttpService();
-const Account = new AccountService();
-const USER_COOKIE = Account.getCookie();
-const USER_CSTF = Account.getCsrf();
 class VipCenter {
   constructor() {}
   getInfo() {
@@ -12,7 +9,7 @@ class VipCenter {
       Http.getThen({
         url,
         headers: {
-          cookie: USER_COOKIE
+          cookie: getCookie()
         }
       })
         .then(resp => {
@@ -35,10 +32,10 @@ class VipTask {
       Http.postThen({
         url,
         body: {
-          csrf: USER_CSTF
+          csrf: getCsrf()
         },
         header: {
-          cookie: $text.URLEncode(USER_COOKIE),
+          cookie: $text.URLEncode(getCookie()),
           "Content-Type": "application/x-www-form-urlencoded",
           "Referer": "www.bilibili.com"
         }
@@ -66,7 +63,7 @@ class VipPrivilege {
       Http.getThen({
         url,
         header: {
-          cookie: USER_COOKIE
+          cookie: getCookie()
         }
       })
         .then(resp => {
@@ -86,10 +83,10 @@ class VipPrivilege {
         url,
         body: {
           type,
-          csrf: USER_CSTF
+          csrf: getCsrf()
         },
         header: {
-          cookie: USER_COOKIE,
+          cookie: getCookie(),
           "Content-Type": "application/x-www-form-urlencoded"
         }
       })
@@ -106,9 +103,8 @@ class VipPrivilege {
 }
 class VipService {
   constructor() {
-    this.Cookie = new AccountService().getCookie();
-    this.VipCenter = new VipCenter(this.Cookie);
-    this.VipPrivilege = new VipPrivilege(this.Cookie);
+    this.VipCenter = new VipCenter();
+    this.VipPrivilege = new VipPrivilege();
     this.Task = new VipTask();
     this.VipCenterInfo = undefined;
   }

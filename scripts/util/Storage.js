@@ -41,6 +41,7 @@ class Keychain {
     });
   }
 }
+
 module.exports = {
-  Keychain
+  Keychain: domain => new Keychain(domain)
 };

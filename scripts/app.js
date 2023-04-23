@@ -15,9 +15,8 @@ class App extends AppKernel {
   }
   init() {
     $ui.loading("正在初始化...");
-    const accountService = new AccountService();
     const mainView = new MainView();
-    if (accountService.isLogin()) {
+    if (AccountService.isLogin()) {
       //$ui.success("登录成功");
       try {
         UserService.checkLoginStatus()
@@ -40,7 +39,7 @@ class App extends AppKernel {
                       title: "退出登录",
                       disabled: false, // Optional
                       handler: () => {
-                        accountService.logout();
+                        AccountService.logout();
                       }
                     },
                     {
@@ -58,7 +57,7 @@ class App extends AppKernel {
               });
               $ui.error("发生未知错误");
               $console.error({
-                cookie: accountService.getCookie()
+                cookie: AccountService.getCookie()
               });
               //accountService.logout();
             }

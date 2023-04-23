@@ -1,14 +1,14 @@
 const { hasString } = require("../util/String");
 const {
-  HttpService,
   getCookieObject,
+  getThen,
+  postThen,
   queryCookieByCookieStr
 } = require("./http.service");
 const UrlUtil = require("../util/Url");
 class UserDataService {
   constructor() {
-    this.Storage = require("../util/Storage");
-    this.Keychain = new this.Storage.Keychain("bilibili.user.auth");
+    this.Keychain = require("../util/Storage").Keychain("bilibili.user.auth");
     this.Key = {
       accesskey: "accesskey",
       cookie: "cookie",
@@ -52,7 +52,7 @@ class UserDataService {
 }
 class LoginService {
   constructor() {
-    this.HttpService = new HttpService();
+    //this.HttpService = new HttpService();
     this.userData = new UserDataService();
   }
   isLogin() {
@@ -110,10 +110,9 @@ class LoginService {
     return new Promise((resolve, reject) => {
       const url =
         "https://passport.bilibili.com/x/passport-login/web/qrcode/generate";
-      $http
-        .get({
-          url
-        })
+      getThen({
+        url
+      })
         .then(resp => {
           const result = resp.data;
           if (result.code === 0) {
@@ -130,10 +129,9 @@ class LoginService {
   loginByQrcode(qrcode_key) {
     return new Promise((resolve, reject) => {
       const url = `https://passport.bilibili.com/x/passport-login/web/qrcode/poll?qrcode_key=${qrcode_key}`;
-      $http
-        .get({
-          url
-        })
+      getThen({
+        url
+      })
         .then(resp => {
           const result = resp.data;
 
@@ -163,7 +161,7 @@ class LoginService {
     this.userData.clearAllData();
   }
 }
-class AccountService {
+class AccountServiceOld {
   constructor() {
     this.LoginService = new LoginService();
     this.UserDataService = this.LoginService.userData;
@@ -203,4 +201,20 @@ class AccountService {
     );
   }
 }
-module.exports = AccountService;
+const UserData = new UserDataService(),
+  Login = new LoginService(),
+  accountService = {
+    getCookie: () => UserData.getCookie(),
+    setCookie: _cookie => UserData.setCookie(_cookie),
+    getCsrf: () => UserData.getCsrf(),
+    setCsrf: _csrf => UserData.setCsrf(_csrf),
+    importCookieAndCsrf: (_cookie, _csrf) => {
+      return UserData.setCookie(_cookie) && UserData.setCsrf(_csrf);
+    },
+    isLogin: () => Login.isLogin(),
+    checkLoginStatus: () => Login.checkLoginStatus(),
+    getQrcodeKey: Login.getQrcodeKey(),
+    loginByQrcode: _qrcodeKey => Login.loginByQrcode(_qrcodeKey),
+    logout: () => Login.logout()
+  };
+module.exports = accountService;

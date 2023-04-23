@@ -1,15 +1,10 @@
-class StringUtil {
-  constructor() {}
-  hasString(string) {
+function hasString(string) {
     return typeof string === "string" && string.length > 0;
   }
-  isString(string) {
+ function isString(string) {
     return typeof string === "string";
   }
-}
-
-const stringUtil = new StringUtil();
 module.exports = {
-  hasString: stringUtil.hasString,
-  isString: stringUtil.isString
+  hasString,
+  isString
 };

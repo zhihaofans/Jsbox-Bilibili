@@ -61,12 +61,11 @@ class WatchHistory {
 }
 class HistoryService {
   constructor() {
-    this.AccountService = new AccountService();
     this.HttpService = new HttpService();
-    this.WatchHistory = new WatchHistory(this.AccountService.getCookie());
+    this.WatchHistory = new WatchHistory(AccountService.getCookie());
     this.LaterToView = new LaterToView(
-      this.AccountService.getCookie(),
-      this.AccountService.getCsrf()
+      AccountService.getCookie(),
+      AccountService.getCsrf()
     );
   }
   getLaterToViewList() {

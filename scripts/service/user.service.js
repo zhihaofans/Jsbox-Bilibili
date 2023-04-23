@@ -1,11 +1,9 @@
 const Http = require("./http.service");
 const HttpService = new Http.HttpService();
 const AccountService = require("./account.service");
-const accountService = new AccountService();
-const cookie = accountService.getCookie();
+const cookie = AccountService.getCookie();
 class UserInfoService {
   constructor() {
-    this.AccountService = new AccountService();
   }
   getNavData(rawData = false) {
     return new Promise((resolve, reject) => {

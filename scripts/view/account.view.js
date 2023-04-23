@@ -5,7 +5,6 @@ const { showDoubleInputAlert } = require("../util/Alert");
 const AppService = require("../service/app.service");
 class LoginView {
   constructor(app) {
-    this.AccountService = new AccountService();
     this.ListView = new ListView();
     this.ImageView = new ImageView();
   }
@@ -27,11 +26,11 @@ class LoginView {
                 message: "第一个:Cookie，第二个:Csrf",
                 inputItem: [
                   {
-                    text: this.AccountService.getCookie(),
+                    text: AccountService.getCookie(),
                     placeholder: "cookie"
                   },
                   {
-                    text: this.AccountService.getCsrf(),
+                    text: AccountService.getCsrf(),
                     placeholder: "csrf"
                   }
                 ]
@@ -42,7 +41,7 @@ class LoginView {
                     cookie,
                     csrf
                   });
-                  const importResult = this.AccountService.importCookieAndCsrf(
+                  const importResult = AccountService.importCookieAndCsrf(
                     cookie,
                     csrf
                   );
@@ -67,7 +66,7 @@ class LoginView {
     $ui.loading(true);
     return new Promise((resolve, reject) => {
       $console.info("scanQrcode2Login.start");
-      this.AccountService.getQrcodeKey()
+      AccountService.getQrcodeKey()
         .then(result => {
           $console.info({
             result
@@ -115,7 +114,7 @@ class LoginView {
     if (sender && qrcode_key) {
       sender.enabled = false;
       sender.title = "Checking...";
-      this.AccountService.loginByQrcode(qrcode_key)
+      AccountService.loginByQrcode(qrcode_key)
         .then(result => {
           const { code, message, refresh_token, url, timestamp } = result;
 

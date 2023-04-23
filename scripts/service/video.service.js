@@ -4,7 +4,6 @@ const AccountService = require("./account.service");
 class VideoInfoService {
   constructor() {
     this.HttpService = new HttpService();
-    this.AccountService = new AccountService();
   }
   getVideoInfo(videoId) {
     return new Promise((resolve, reject) => {
@@ -18,7 +17,7 @@ class VideoInfoService {
             bvid: videoId
           },
           header: {
-            cookie: this.AccountService.getCookie()
+            cookie: AccountService.getCookie()
           }
         })
           .then(result => {
