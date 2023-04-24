@@ -3,7 +3,7 @@ const { LoginView } = require("./view/account.view");
 const MainView = require("./view/main.view");
 const AccountService = require("./service/account.service"),
   UserService = require("./service/user.service");
-const { showErrorAlertAndExit } = require("./util/JSBox");
+const { isIpad, showErrorAlertAndExit } = require("./util/JSBox");
 class App extends AppKernel {
   constructor() {
     super({
@@ -104,7 +104,24 @@ class App extends AppKernel {
 
 function init() {
   try {
-    new App().init();
+    if (isIpad()) {
+      $ui.alert({
+        title: "警告",
+        message: "您正在iPad设备上运行，可能出现错误",
+        actions: [
+          {
+            title: "继续",
+            handler: () => new App().init()
+          },
+          {
+            title: "退出",
+            handler: () => $app.close()
+          }
+        ]
+      });
+    } else {
+      new App().init();
+    }
   } catch (error) {
     $console.error(error);
     $ui.alert({
