@@ -1,4 +1,4 @@
-const { getCookie, getCsrf } = require("./account.service");
+const { getCookie, getCsrf, getSESSDATA } = require("./account.service");
 const { HttpService } = require("./http.service");
 const Http = new HttpService();
 class VipCenter {
@@ -35,7 +35,7 @@ class VipTask {
           csrf: getCsrf()
         },
         header: {
-          cookie: $text.URLEncode(getCookie()),
+          Cookie: getCookie(),
           "Content-Type": "application/x-www-form-urlencoded",
           "Referer": "www.bilibili.com"
         }

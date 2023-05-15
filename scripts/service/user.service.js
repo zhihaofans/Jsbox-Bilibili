@@ -1,16 +1,14 @@
 const Http = require("./http.service");
-const HttpService = new Http.HttpService();
 const AccountService = require("./account.service");
 const cookie = AccountService.getCookie();
 class UserInfoService {
-  constructor() {
-  }
+  constructor() {}
   getNavData(rawData = false) {
     return new Promise((resolve, reject) => {
-      const url = "http://api.bilibili.com/x/web-interface/nav";
+      const url = "https://api.bilibili.com/x/web-interface/nav";
       try {
         $console.info("trystart");
-        HttpService.getThen({
+        Http.getThen({
           url,
           header: {
             cookie
@@ -32,7 +30,7 @@ class UserInfoService {
   getNavDataOld(callback, rawData = false) {
     const url = "http://api.bilibili.com/x/web-interface/nav";
     try {
-      HttpService.getCallback({
+      Http.getCallback({
         url,
         header: {
           cookie
@@ -95,7 +93,7 @@ function getNavData(rawData = false) {
     const url = "http://api.bilibili.com/x/web-interface/nav";
     try {
       $console.info("trystart");
-      this.HttpService.getThen({
+      Http.getThen({
         url,
         header: {
           cookie

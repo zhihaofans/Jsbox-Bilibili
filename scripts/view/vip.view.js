@@ -213,6 +213,5 @@ class VipView {
       ]
     });
   }
-  showVipPage() {}
 }
 module.exports = VipView;

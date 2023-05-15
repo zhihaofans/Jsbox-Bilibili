@@ -17,7 +17,6 @@ class App extends AppKernel {
     $ui.loading("正在初始化...");
     const mainView = new MainView();
     if (AccountService.isLogin()) {
-      //$ui.success("登录成功");
       try {
         UserService.checkLoginStatus()
           .then(
