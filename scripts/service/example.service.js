@@ -1,5 +1,4 @@
-const { HttpService } = require("./http.service");
-const httpService = new HttpService();
+const httpService = require("./http.service");
 const { getCookie } = require("./account.service");
 const { hasString } = require("../util/String");
 class ExampleService {
@@ -10,29 +9,34 @@ class ExampleService {
 }
 class HttpExampleService {
   constructor() {}
-  getCallback(callback, rawData = false) {
+  getThen() {
     const url = "";
-    httpService.getCallback({
-      url,
-      params: {},
-      header: {
-        cookie: getCookie()
-      },
-      callback: data => {
-        if (data === undefined || data.code !== 0) {
-          $console.error({
-            _: "getNavData",
-            data
-          });
-          callback(rawData === true ? data : undefined);
-        } else {
-          $console.info({
-            _: "getNavData",
-            data
-          });
-          callback(rawData === true ? data : data.data);
+    return new Promise((resolve, reject) => {
+      httpService.Http.getThen({
+        url,
+        header: {
+          cookie: getCookie()
         }
-      }
+      })
+        .then(result => {
+          resolve(result.data);
+        })
+        .catch(fail => reject(fail));
+    });
+  }
+  postThen() {
+    const url = "";
+    return new Promise((resolve, reject) => {
+      httpService.Http.getThen({
+        url,
+        header: {
+          cookie: getCookie()
+        }
+      })
+        .then(result => {
+          resolve(result.data);
+        })
+        .catch(fail => reject(fail));
     });
   }
 }
