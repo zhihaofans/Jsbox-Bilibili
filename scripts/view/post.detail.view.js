@@ -1,5 +1,5 @@
 const { VideoInfoService } = require("../service/video.service"),
-  { ViewKit } = require("../util/View");
+  { ViewKit, ViewTemplate } = require("../util/View");
 class PostDetailView {
   constructor() {
     this.VideoInfoService = new VideoInfoService();
@@ -10,6 +10,7 @@ class PostDetailView {
     this.VideoInfoService.getVideoInfo(bvid)
       .then(result => {
         $console.info(result);
+        $ui.loading(false);
         if (result.code === 0) {
           const videoInfo = result.data;
           $ui.push({
@@ -17,20 +18,44 @@ class PostDetailView {
               title: "video"
             },
             views: [
-              {
-                type: "image",
-                props: {
-                  id: "imageCover",
-                  scale: 9 / 16,
-                  src: videoInfo.pic
-                },
+              ViewTemplate.getImage({
+                id: "imageCover",
+                src: videoInfo.pic,
                 layout: (make, view) => {
-                  make.left.top.right.equalTo(0);
-                  //make.width.equalTo(view.width);
-                  $console.info(make.width);
-                  //make.height.equalTo(view.width/16*9);
+                  make.left.top.right.inset(10);
+                  make.width.equalTo(view.width);
+                  make.height.equalTo(200);
+                },
+                tapped: sender => {
+                  $console.info(sender.src);
                 }
-              }
+              }),
+              ViewTemplate.getLabel({
+                id: "labelUserName",
+                text: videoInfo.owner.name,
+                layout: (make, view) => {
+                  make.left.inset(0);
+                  make.top.greaterThanOrEqualTo(220);
+                  //make.width.equalTo(view.width);
+                  make.height.equalTo(30);
+                },
+                tapped: sender => {
+                  $console.info(sender.text);
+                }
+              }),
+              ViewTemplate.getLabel({
+                id: "labelVideoTitle",
+                text: `@${videoInfo.title}`,
+                layout: (make, view) => {
+                  make.left.inset(0);
+                  make.top.greaterThanOrEqualTo($("labelUserName").bottom);
+                  //make.width.equalTo(view.width);
+                  make.height.equalTo(30);
+                },
+                tapped: sender => {
+                  $console.info(sender.text);
+                }
+              })
             ]
           });
         } else {
