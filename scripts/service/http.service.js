@@ -129,6 +129,15 @@ function getCookieObject(cookie) {
     return undefined;
   }
 }
+function queryCookieByStr(cookieStr, key) {
+  if (cookieStr === undefined || key === undefined) {
+    return undefined;
+  }
+  const regex = new RegExp(`,?\\s*${key}=(\\S+);`);
+  const matches = regex.exec(cookieStr);
+  const result = matches && matches[1];
+  return result || undefined;
+}
 function getParamsFromUrl(URL) {
   return JSON.parse(
     '{"' +
@@ -152,9 +161,6 @@ function postThen({ url, params, header, body }) {
     body
   });
 }
-function queryCookieByCookieStr(cookieStr, name) {
-  return `; ${cookieStr}`.split(`; ${name}=`).pop().split(";").shift();
-}
 module.exports = {
   addParamsToUrl,
   concatUrlParams,
@@ -162,6 +168,7 @@ module.exports = {
   getParamsFromUrl,
   getThen,
   postThen,
-  queryCookieByCookieStr,
+  queryCookieByCookieStr: queryCookieByStr,
+  queryCookieByStr,
   HttpService
 };
