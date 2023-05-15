@@ -408,7 +408,8 @@ class GridView {
   }
   showGrid3({ itemList, title, callback = (idx, data) => {} }) {
     const viewData = this.getGridData({
-      itemList
+      itemList,
+      callback
     });
     this.ViewKit.showView({
       props: {
@@ -424,11 +425,41 @@ class ViewKit {
     $ui.window === undefined ? $ui.render(viewData) : $ui.push(viewData);
   }
 }
+const ViewTemplate = {
+  getImage: ({ id, props, src, layout, events, tapped }) => {
+    return {
+      type: "image",
+      props: props || {
+        id,
+        src
+      },
+      layout,
+      events: events || {
+        tapped
+      }
+    };
+  },
+  getLabel: ({ id, props, text, layout, events, tapped }) => {
+    return {
+      type: "label",
+      props: props || {
+        id,
+        text,
+        align: $align.center
+      },
+      layout,
+      events: events || {
+        tapped
+      }
+    };
+  }
+};
 module.exports = {
   GridView,
   ImageView,
   ListView,
   NavView,
   PageView,
-  ViewKit
+  ViewKit,
+  ViewTemplate
 };
