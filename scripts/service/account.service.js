@@ -3,7 +3,7 @@ const {
   getCookieObject,
   getThen,
   postThen,
-  queryCookieByCookieStr
+  queryCookieByStr
 } = require("./http.service");
 const UrlUtil = require("../util/Url");
 class UserDataService {
@@ -19,25 +19,23 @@ class UserDataService {
     this.Keychain.remove(this.Key.cookie);
     this.Keychain.remove(this.Key.csrf);
   }
+  getCookieKey(key) {
+    return queryCookieByStr("," + this.getCookie(), key);
+  }
   getCookie() {
-    return this.Keychain.get(this.Key.cookie);
+    const result = this.Keychain.get(this.Key.cookie);
+    return result;
   }
   setCookie(cookie) {
     if (cookie === undefined || cookie.length == 0) {
       return false;
     }
     const resultCookie = this.Keychain.set(this.Key.cookie, cookie);
-    const cookieObj = getCookieObject(cookie);
-    const csrf = queryCookieByCookieStr(cookie, "bili_jct");
-    $console.info({
-      cookieObj,
-      csrf
-    });
-    const resultCsrf = this.setCsrf(cookieObj?.bili_jct || csrf);
+    const resultCsrf = this.setCsrf(this.getCookieKey("bili_jct"));
     return resultCookie && resultCsrf;
   }
   getCsrf() {
-    return this.Keychain.get(this.Key.csrf);
+    return queryCookieByStr(this.getCookie(), "bili_jct");
   }
   setCsrf(csrf) {
     return this.Keychain.set(this.Key.csrf, csrf);
@@ -48,7 +46,9 @@ class UserDataService {
   setAccesskey(accesskey) {
     return this.Keychain.set(this.Key.accesskey, accesskey);
   }
-  checkCsrf() {}
+  getSESSDATA() {
+    return this.getCookieKey("SESSDATA");
+  }
 }
 class LoginService {
   constructor() {
@@ -208,12 +208,13 @@ const UserData = new UserDataService(),
     setCookie: _cookie => UserData.setCookie(_cookie),
     getCsrf: () => UserData.getCsrf(),
     setCsrf: _csrf => UserData.setCsrf(_csrf),
+    getSESSDATA: () => UserData.getSESSDATA(),
     importCookieAndCsrf: (_cookie, _csrf) => {
       return UserData.setCookie(_cookie) && UserData.setCsrf(_csrf);
     },
     isLogin: () => Login.isLogin(),
     checkLoginStatus: () => Login.checkLoginStatus(),
-    getQrcodeKey: Login.getQrcodeKey(),
+    getQrcodeKey: () => Login.getQrcodeKey(),
     loginByQrcode: _qrcodeKey => Login.loginByQrcode(_qrcodeKey),
     logout: () => Login.logout()
   };
