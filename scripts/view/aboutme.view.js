@@ -149,8 +149,8 @@ function init() {
         showAboutmeView(result.data);
       } else {
         $ui.alert({
-          title: "Hello",
-          message: result.message,
+          title: "发生错误",
+          message: result.message || "可能是网络错误",
           actions: [
             {
               title: "OK",

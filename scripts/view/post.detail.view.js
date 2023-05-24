@@ -32,9 +32,9 @@ class PostDetailView {
               }),
               ViewTemplate.getLabel({
                 id: "labelUserName",
-                text: videoInfo.owner.name,
+                text: `@${videoInfo.owner.name}`,
                 layout: (make, view) => {
-                  make.left.inset(0);
+                  make.left.right.inset(10);
                   make.top.greaterThanOrEqualTo(220);
                   //make.width.equalTo(view.width);
                   make.height.equalTo(30);
@@ -45,9 +45,10 @@ class PostDetailView {
               }),
               ViewTemplate.getLabel({
                 id: "labelVideoTitle",
-                text: `@${videoInfo.title}`,
+                text: videoInfo.title,
+                lines: 0,
                 layout: (make, view) => {
-                  make.left.inset(0);
+                  make.left.right.inset(10);
                   make.top.greaterThanOrEqualTo($("labelUserName").bottom);
                   //make.width.equalTo(view.width);
                   make.height.equalTo(30);

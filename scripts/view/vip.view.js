@@ -186,6 +186,19 @@ class VipView {
         })
         .catch(error => {
           $console.error(error);
+          $ui.alert({
+            title: "加载失败",
+            message: "请检查网络状态",
+            actions: [
+              {
+                title: "OK",
+                disabled: false, // Optional
+                handler: () => {
+                  $ui.pop();
+                }
+              }
+            ]
+          });
         });
     });
   }
