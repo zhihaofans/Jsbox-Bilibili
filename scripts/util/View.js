@@ -439,13 +439,14 @@ const ViewTemplate = {
       }
     };
   },
-  getLabel: ({ id, props, text, layout, events, tapped }) => {
+  getLabel: ({ id, props, text, layout, events, tapped, lines }) => {
     return {
       type: "label",
       props: props || {
         id,
         text,
-        align: $align.center
+        align: $align.center,
+        lines: lines || 1
       },
       layout,
       events: events || {
