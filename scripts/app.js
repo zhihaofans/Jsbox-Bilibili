@@ -38,12 +38,30 @@ class App extends AppKernel {
                       title: "退出登录",
                       disabled: false, // Optional
                       handler: () => {
-                        AccountService.logout();
+                        $ui.alert({
+                          title: "真的要退出登录吗？",
+                          message: "",
+                          actions: [
+                            {
+                              title: "点错了",
+                              disabled: false, // Optional
+                              handler: () => $app.close()
+                            },
+                            {
+                              title: "确定退出",
+                              handler: () => AccountService.logout()
+                            }
+                          ]
+                        });
                       }
                     },
                     {
                       title: "不理",
-                      handler: () => {}
+                      handler: () => mainView.init()
+                    },
+                    {
+                      title: "离开",
+                      handler: () => $app.close()
                     }
                   ]
                 });
