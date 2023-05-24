@@ -9,11 +9,12 @@ class MainView {
     this.ViewKit = new ViewKit();
     this.HistoryView = new HistoryView();
     this.NavView = new NavView();
+    this.MangaView = require("./manga.view");
   }
   init() {
     try {
       const title = "哔哩哔哩(已登录)",
-        textList = ["观看历史", "稍后再看"],
+        textList = ["观看历史", "稍后再看", "漫画签到"],
         didSelect = index => {
           switch (index) {
             case 0:
@@ -22,18 +23,16 @@ class MainView {
             case 1:
               this.HistoryView.showLaterToView();
               break;
+            case 2:
+              this.MangaView.init();
+              break;
             default:
           }
         };
-      const mIconSymbols = [
-        "square.grid.2x2.fill",
-        "square.and.arrow.down.fill",
-        "person.fill"
-      ];
       const navList = [
           {
-            title: "浏览",
-            icon: "tv.fill",
+            title: "主页",
+            icon: "house.fill",
             selected: true,
             func: () => {}
           },
@@ -130,7 +129,7 @@ class MainView {
             data: navData || [
               {
                 menu_image: {
-                  symbol: mIconSymbols[0],
+                  symbol: "square.grid.2x2.fill",
                   tintColor: $color("gray")
                 },
                 menu_label: {
@@ -150,7 +149,7 @@ class MainView {
               },
               {
                 menu_image: {
-                  symbol: mIconSymbols[2],
+                  symbol: "person.fill",
                   tintColor: $color("gray")
                 },
                 menu_label: {
