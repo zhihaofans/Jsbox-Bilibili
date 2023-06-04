@@ -1,5 +1,4 @@
 const { ListView, NavView, ViewKit } = require("../util/View");
-const HistoryView = require("./history.view");
 const VipView = require("./vip.view");
 const { showErrorAlertAndExit } = require("../util/JSBox");
 const COLOR = require("../config/color");
@@ -7,26 +6,20 @@ class MainView {
   constructor() {
     this.ListView = new ListView();
     this.ViewKit = new ViewKit();
-    this.HistoryView = new HistoryView();
     this.NavView = new NavView();
     this.MangaView = require("./manga.view");
   }
   init() {
     try {
       const title = "哔哩哔哩(已登录)",
-        textList = ["观看历史", "稍后再看", "漫画签到"],
+        textList = ["漫画签到"],
         didSelect = index => {
           switch (index) {
             case 0:
-              this.HistoryView.showHistory();
-              break;
-            case 1:
-              this.HistoryView.showLaterToView();
-              break;
-            case 2:
               this.MangaView.init();
               break;
             default:
+              $ui.error("?");
           }
         };
       const navList = [

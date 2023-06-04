@@ -1,6 +1,8 @@
 const UserService = require("../service/user.service");
 const { ViewTemplate } = require("../util/View");
-
+const HistoryViewObj = require("./history.view");
+const HistoryView = new HistoryViewObj();
+const { showErrorAlertAndExit } = require("../util/JSBox");
 function showAboutmeView(navData) {
   const moneyTemplate = [
       {
@@ -54,7 +56,7 @@ function showAboutmeView(navData) {
     moneyView = {
       type: "matrix",
       props: {
-        id: "tab",
+        id: "tabMoney",
         columns: 3,
         itemHeight: 80,
         spacing: 0,
@@ -97,6 +99,112 @@ function showAboutmeView(navData) {
         }
       }
     },
+    historyTabTemplate = [
+      {
+        type: "image",
+        props: {
+          id: "imageIcon"
+        },
+        layout: function (make, view) {
+          //make.edges.equalTo(view.super)
+          make.center.equalTo(view.super);
+          //make.size.equalTo($size(30, 30));
+        }
+      },
+      {
+        type: "label",
+        props: {
+          id: "labelTitle",
+          font: $font(16),
+          align: $align.center
+        },
+        layout: function (make, view) {
+          make.bottom.inset(0);
+          make.centerX.equalTo(view.super);
+        }
+      }
+    ],
+    historyTabData = [
+      {
+        imageIcon: {
+          symbol: "star.fill"
+        },
+        labelTitle: {
+          text: "收藏"
+        }
+      },
+      {
+        imageIcon: {
+          symbol: "eye.fill"
+        },
+        labelTitle: {
+          text: "稍后再看"
+        }
+      },
+      {
+        imageIcon: {
+          symbol: "gobackward"
+        },
+        labelTitle: {
+          text: "历史"
+        }
+      }
+    ],
+    historyTabView = {
+      type: "matrix",
+      props: {
+        id: "tabHistory",
+        columns: 3,
+        itemHeight: 80,
+        spacing: 0,
+        scrollEnabled: false,
+        //bgcolor: $color("clear"),
+        template: [
+          {
+            type: "view",
+            props: {
+              id: "view_item",
+              border: {
+                color: $color("gray"),
+                width: 20
+              }
+            },
+            layout: (make, view) => {
+              //make.size.equalTo(view.super);
+              make.center.equalTo(view.super);
+              make.height.equalTo(80);
+            },
+            views: historyTabTemplate
+          }
+        ],
+        data: historyTabData
+      },
+      layout: (make, view) => {
+        //make.bottom.inset(0);
+        make.top.greaterThanOrEqualTo($("tabMoney").bottom);
+        if ($device.info.screen.width > 500) {
+          make.width.equalTo(500);
+        } else {
+          make.left.right.equalTo(0);
+        }
+        make.centerX.equalTo(view.super);
+        make.height.equalTo(90);
+      },
+      events: {
+        didSelect(sender, indexPath, data) {
+          $console.info(indexPath, data);
+          switch (indexPath.row) {
+            case 1:
+              HistoryView.showLaterToView();
+              break;
+            case 2:
+              HistoryView.showHistory();
+              break;
+            default:
+          }
+        }
+      }
+    },
     viewData = {
       props: {
         title: "我"
@@ -114,15 +222,13 @@ function showAboutmeView(navData) {
                 make.size.equalTo($size(100, 100));
                 make.top.equalTo(5);
               },
-              events: {
-                didSelect: (sender, indexPath, data) => {
-                  $quicklook.open({
-                    url: navData.face,
-                    handler: function () {
-                      // Handle dismiss action, optional
-                    }
-                  });
-                }
+              tapped: (sender, indexPath, data) => {
+                $quicklook.open({
+                  url: navData.face,
+                  handler: function () {
+                    // Handle dismiss action, optional
+                  }
+                });
               }
             }),
             ViewTemplate.getLabel({
@@ -133,7 +239,8 @@ function showAboutmeView(navData) {
                 make.top.equalTo($("imageUserCover").bottom);
               }
             }),
-            moneyView
+            moneyView,
+            historyTabView
           ]
         }
       ]
@@ -142,8 +249,10 @@ function showAboutmeView(navData) {
 }
 
 function init() {
+  $ui.loading(true);
   UserService.getNavData()
     .then(result => {
+      $ui.loading(false);
       $console.info(result);
       if (result.code === 0) {
         showAboutmeView(result.data);
@@ -166,7 +275,9 @@ function init() {
       }
     })
     .catch(fail => {
+      $ui.loading(false);
       $console.info(fail);
+      showErrorAlertAndExit(fail.message);
     });
 }
 module.exports = {
