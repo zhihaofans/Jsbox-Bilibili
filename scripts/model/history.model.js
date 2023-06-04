@@ -12,6 +12,10 @@ class PublishItemData {
     this.desc = videoData.desc; //简介
     this.kid = videoData.kid;
     this.parts_count = videoData.videos; //稿件分P总数
+    this.progress = videoData.progress; //视频观看进度(秒)
+    if (this.progress < 0) this.progress = 0;
+    this.duration = videoData.duration; //视频总长度(秒)
+    this.view_percentage = ((this.progress * 100) / this.duration).toFixed(2);
     this.publish_location = videoData.pub_location; //发布定位
     this.publish_time = videoData.pubdate; //发布时间
     this.short_link = videoData.short_link_v2 || videoData.short_link;
