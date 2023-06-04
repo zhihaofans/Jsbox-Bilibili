@@ -12,13 +12,17 @@ class VideoList {
         //      $console.info({
         //        thisVideo
         //      });
-        let authorTitle = "";
+        let authorTitle = "",
+          viewProgress = ` (已看${thisVideo.view_percentage}%)`;
+        if (thisVideo.progress === 0) {
+          viewProgress = " (未看)";
+        }
         switch (thisVideo.business) {
           case "pgc":
-            authorTitle = thisVideo.show_title;
+            authorTitle = thisVideo.show_title + viewProgress;
             break;
           default:
-            authorTitle = "@" + thisVideo.author_name;
+            authorTitle = "@" + thisVideo.author_name + viewProgress;
         }
         if (thisVideo.badge) {
           authorTitle += `\n[${thisVideo.badge}]`;
@@ -55,9 +59,28 @@ class VideoList {
           AppService.openVideo(videoItem.bvid);
         }
       };
+    const later2watchNavMenu = [
+      {
+        title: "菜单",
+        symbol: "command", // SF symbols are supported
+        handler: sender => {
+          $ui.alert("Tapped!");
+        },
+        menu: {
+          title: "长按菜单",
+          items: [
+            {
+              title: "移除看完视频",
+              handler: sender => {}
+            }
+          ]
+        } // Pull-Down menu
+      }
+    ];
     $ui.push({
       props: {
-        title
+        title,
+        navButtons: isHistory !== true ? later2watchNavMenu : undefined
       },
       views: [
         {
