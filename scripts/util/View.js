@@ -426,6 +426,31 @@ class ViewKit {
   }
 }
 const ViewTemplate = {
+  getButton: ({
+    id,
+    props,
+    title,
+    layout,
+    events,
+    tapped,
+    titleColor,
+    type
+  }) => {
+    return {
+      type: "button",
+      props: props || {
+        id,
+        title,
+        align: $align.center,
+        titleColor,
+        type
+      },
+      layout,
+      events: events || {
+        tapped
+      }
+    };
+  },
   getImage: ({ id, props, src, layout, events, tapped }) => {
     return {
       type: "image",
