@@ -8,15 +8,19 @@ class MainView {
     this.ViewKit = new ViewKit();
     this.NavView = new NavView();
     this.MangaView = require("./manga.view");
+    this.DynamicView = require("./dynamic.view");
   }
   init() {
     try {
       const title = "哔哩哔哩(已登录)",
-        textList = ["漫画签到"],
+        textList = ["漫画签到", "动态"],
         didSelect = index => {
           switch (index) {
             case 0:
               this.MangaView.init();
+              break;
+            case 1:
+              this.DynamicView.init();
               break;
             default:
               $ui.error("?");
