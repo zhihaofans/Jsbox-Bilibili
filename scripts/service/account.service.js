@@ -31,14 +31,10 @@ class UserDataService {
       return false;
     }
     const resultCookie = this.Keychain.set(this.Key.cookie, cookie);
-    const resultCsrf = this.setCsrf(this.getCookieKey("bili_jct"));
     return resultCookie && resultCsrf;
   }
   getCsrf() {
-    return queryCookieByStr(this.getCookie(), "bili_jct");
-  }
-  setCsrf(csrf) {
-    return this.Keychain.set(this.Key.csrf, csrf);
+    return this.getCookieKey("bili_jct");
   }
   getAccesskey() {
     return this.Keychain.get(this.Key.accesskey);
@@ -48,6 +44,9 @@ class UserDataService {
   }
   getSESSDATA() {
     return this.getCookieKey("SESSDATA");
+  }
+  getUid() {
+    return this.getCookieKey("DedeUserID");
   }
 }
 class LoginService {
@@ -209,6 +208,7 @@ const UserData = new UserDataService(),
     getCsrf: () => UserData.getCsrf(),
     setCsrf: _csrf => UserData.setCsrf(_csrf),
     getSESSDATA: () => UserData.getSESSDATA(),
+    getUid: () => UserData.getUid(),
     importCookieAndCsrf: (_cookie, _csrf) => {
       return UserData.setCookie(_cookie) && UserData.setCsrf(_csrf);
     },
