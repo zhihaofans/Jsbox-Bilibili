@@ -26,6 +26,22 @@ function showDynamicList(title, dynamicListData) {
       });
       if (dynamicItem.bvid) {
         AppService.openVideo(dynamicItem.bvid);
+      } else {
+        $ui.alert({
+          title: dynamicItem.uname,
+          message: dynamicItem.text,
+          actions: [
+            {
+              title: "OK",
+              disabled: false, // Optional
+              handler: () => {}
+            },
+            {
+              title: "Cancel",
+              handler: () => {}
+            }
+          ]
+        });
       }
     };
   $ui.push({
@@ -76,10 +92,21 @@ function showDynamicList(title, dynamicListData) {
               handler: (title, idx) => {
                 switch (idx) {
                   case 0:
-                    $ui.preview({
-                      title: "动态封面图",
-                      url: selectItem.image
-                    });
+                    $console.info(selectItem.image_list);
+                    if (
+                      selectItem.image_list &&
+                      selectItem.image_list.length > 0
+                    ) {
+                      $console.info("OK");
+                      $quicklook.open({
+                        list: selectItem.image_list.map(img => img.img_src)
+                      });
+                    } else {
+                      $ui.preview({
+                        title: "动态封面图",
+                        url: selectItem.image
+                      });
+                    }
                     break;
                   case 1:
                     if (selectItem.bvid) {

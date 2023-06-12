@@ -15,14 +15,22 @@ class DynamicItemData {
         this.text = this.card.item.content;
         this.origin = JSON.parse(this.card.origin);
         $console.info(this.origin);
-        this.image = this.origin.pic;
+
+        if (this.origin.item.pictures_count > 0) {
+          this.image = this.origin.item.pictures[0].img_src;
+          this.image_list = this.origin.item.pictures;
+        } else {
+          this.image = this.origin.pic;
+        }
         break;
       case 2:
         this.text = this.card.item.description;
-        this.image =
-          this.card.item.pictures_count > 0
-            ? this.card.item.pictures[0].img_src
-            : "";
+        if (this.card.item.pictures_count > 0) {
+          this.image = this.card.item.pictures[0].img_src;
+          this.image_list = this.card.item.pictures;
+        } else {
+          this.image = this.card.user.face;
+        }
         break;
       case 4308:
         this.text = this.card.live_play_info.title;
