@@ -1,22 +1,26 @@
 class DynamicItemData {
   constructor({ card, desc }) {
     this.card = JSON.parse(card);
-    //$console.info(this.card);
+    $console.warn(this.card);
+    $console.info(desc);
     // Dynamic info
     this.dynamic_id = desc.dynamic_id;
-    this.dynamic_type = desc.type; //8:视频,4308:直播,2:图文动态,1:转发,4:文字动态
+    this.dynamic_type = desc.type; //8:视频,4308:直播,2:图文动态,1:转发,4:文字动态,0:文章
     switch (this.dynamic_type) {
+      case 0:
+        this.text = this.card.title;
+        this.image = this.card.banner_url;
+        this.image_list = this.card.image_urls;
+        break;
       case 4:
         this.text = this.card.item.content;
         this.image = this.card.user.face;
-
         break;
       case 1:
         this.text = this.card.item.content;
         this.origin = JSON.parse(this.card.origin);
         $console.info(this.origin);
-
-        if (this.origin.item.pictures_count > 0) {
+        if (this.origin.item?.pictures && this.origin.item.pictures_count > 0) {
           this.image = this.origin.item.pictures[0].img_src;
           this.image_list = this.origin.item.pictures;
         } else {

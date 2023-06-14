@@ -2,6 +2,7 @@ const { getDynamicList } = require("../service/dynamic.service");
 const { DynamicItemData } = require("../model/dynamic.model");
 const AppService = require("../service/app.service");
 const PostDetailView = require("./post.detail.view");
+const { openDynamic } = require("../service/app.service");
 function showDynamicList(title, dynamicListData) {
   const itemList = dynamicListData.map(dynamicItem => {
       //      $console.info({
@@ -27,21 +28,24 @@ function showDynamicList(title, dynamicListData) {
       if (dynamicItem.bvid) {
         AppService.openVideo(dynamicItem.bvid);
       } else {
-        $ui.alert({
-          title: dynamicItem.uname,
-          message: dynamicItem.text,
-          actions: [
-            {
-              title: "OK",
-              disabled: false, // Optional
-              handler: () => {}
-            },
-            {
-              title: "Cancel",
-              handler: () => {}
-            }
-          ]
-        });
+        switch (dynamicItem.dynamic_type) {
+          default:
+            $ui.alert({
+              title: dynamicItem.uname,
+              message: dynamicItem.text,
+              actions: [
+                {
+                  title: "OK",
+                  disabled: false, // Optional
+                  handler: () => {}
+                },
+                {
+                  title: "Cancel",
+                  handler: () => {}
+                }
+              ]
+            });
+        }
       }
     };
   $ui.push({
