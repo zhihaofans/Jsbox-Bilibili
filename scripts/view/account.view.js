@@ -3,6 +3,7 @@ const UserService = require("../service/user.service");
 const { ImageView, ListView } = require("../util/View");
 const { showDoubleInputAlert } = require("../util/Alert");
 const AppService = require("../service/app.service");
+const { hasString } = require("../util/String");
 class LoginView {
   constructor(app) {
     this.ListView = new ListView();
@@ -50,6 +51,10 @@ class LoginView {
                 .catch(fail => {
                   $console.error(fail);
                   $ui.error("alert catch");
+                  reject({
+                    error: true,
+                    message: fail?.message || "未知错误"
+                  });
                 });
               break;
             default:
@@ -153,6 +158,90 @@ class LoginView {
         });
     } else {
       $ui.error("检测失败，发生代码错误");
+    }
+  }
+  checkLoginDataStatus() {
+    const loginDataStatus = AccountService.checkLoginDataStatus(),
+      statusData = loginDataStatus.data,
+      { access_key, cookie, csrf, uid } = statusData,
+      keyList = Object.keys(loginDataStatus.data),
+      listItem = keyList.map(key => {
+        const item = loginDataStatus.data[key];
+        return {
+          title: key,
+          rows: ["Error:" + item.fail.toString(), item.value]
+        };
+      }),
+      editableList = ["access_key"];
+
+    $ui.push({
+      props: {
+        title: `${loginDataStatus.count}项错误`
+      },
+      views: [
+        {
+          type: "list",
+          props: {
+            data: listItem
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (sender, indexPath, data) => {
+              const { section, row } = indexPath,
+                itemKey = keyList[section],
+                item = statusData[itemKey];
+              if (item.fail) {
+                $ui.alert({
+                  title: "发现错误",
+                  message: `缺少${itemKey}`,
+                  actions: [
+                    {
+                      title: "OK",
+                      disabled: false, // Optional
+                      handler: () => {}
+                    },
+                    {
+                      title: "修改错误",
+                      disabled: !editableList.includes(itemKey),
+                      handler: () => this.editLoginData(itemKey)
+                    },
+                    {
+                      title: "Cancel",
+                      handler: () => {}
+                    }
+                  ]
+                });
+              } else {
+                $input.text({
+                  type: $kbType.text,
+                  placeholder: "",
+                  text: item.value,
+                  handler: text => {}
+                });
+              }
+            }
+          }
+        }
+      ]
+    });
+  }
+  editLoginData(key) {
+    switch (key) {
+      case "access_key":
+        $input.text({
+          type: $kbType.text,
+          placeholder: key,
+          text: "",
+          handler: text => {
+            if (hasString(text)) {
+              const result = AccountService.setAccesskey(text);
+              result ? $ui.success("ok") : $ui.error("fail");
+            }
+          }
+        });
+        break;
+      default:
+        $ui.error("不支持修改" + key);
     }
   }
 }

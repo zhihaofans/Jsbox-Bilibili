@@ -32,4 +32,16 @@ const openArticle = kid => {
     throw new Error("空白kid");
   }
 };
-module.exports = { openArticle, openBangumi, openVideo, openWebBrowser };
+// Dynamic
+const openDynamic = dynamicId => {
+  if (dynamicId) {
+    $app.openURL(`https://m.bilibili.com/opus/${dynamicId}`);
+  }
+};
+module.exports = {
+  openArticle,
+  openBangumi,
+  openDynamic,
+  openVideo,
+  openWebBrowser
+};

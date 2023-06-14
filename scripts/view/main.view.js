@@ -2,6 +2,7 @@ const { ListView, NavView, ViewKit } = require("../util/View");
 const VipView = require("./vip.view");
 const { showErrorAlertAndExit } = require("../util/JSBox");
 const COLOR = require("../config/color");
+const { LoginView } = require("./account.view");
 class MainView {
   constructor() {
     this.ListView = new ListView();
@@ -13,7 +14,7 @@ class MainView {
   init() {
     try {
       const title = "哔哩哔哩(已登录)",
-        textList = ["漫画签到", "动态"],
+        textList = ["漫画签到", "动态", "test"],
         didSelect = index => {
           switch (index) {
             case 0:
@@ -21,6 +22,13 @@ class MainView {
               break;
             case 1:
               this.DynamicView.init();
+              break;
+            case 2:
+              try {
+                new LoginView().checkLoginDataStatus();
+              } catch (error) {
+                $console.error(error);
+              }
               break;
             default:
               $ui.error("?");

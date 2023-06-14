@@ -31,7 +31,7 @@ class UserDataService {
       return false;
     }
     const resultCookie = this.Keychain.set(this.Key.cookie, cookie);
-    return resultCookie && resultCsrf;
+    return resultCookie;
   }
   getCsrf() {
     return this.getCookieKey("bili_jct");
@@ -160,62 +160,75 @@ class LoginService {
     this.userData.clearAllData();
   }
 }
-class AccountServiceOld {
-  constructor() {
-    this.LoginService = new LoginService();
-    this.UserDataService = this.LoginService.userData;
-  }
-  checkLoginStatus(callback) {
-    if (callback === undefined) {
-      return this.LoginService.checkLoginStatus();
-    } else {
-      this.LoginService.checkLoginStatus(callback);
-    }
-  }
-  getCookie() {
-    return this.UserDataService.getCookie();
-  }
-  getCsrf() {
-    return this.UserDataService.getCsrf();
-  }
-  getQrcodeKey() {
-    return this.LoginService.getQrcodeKey();
-  }
-  isLogin() {
-    return this.LoginService.isLogin();
-  }
-  importCookie() {
-    return this.LoginService.inportCookie();
-  }
-  loginByQrcode(qrcode_key) {
-    return this.LoginService.loginByQrcode(qrcode_key);
-  }
-  logout() {
-    this.LoginService.logout();
-  }
-  importCookieAndCsrf(cookie, csrf) {
-    return (
-      this.UserDataService.setCookie(cookie) &&
-      this.UserDataService.setCsrf(csrf)
-    );
-  }
-}
+
 const UserData = new UserDataService(),
-  Login = new LoginService(),
-  accountService = {
-    getCookie: () => UserData.getCookie(),
-    setCookie: _cookie => UserData.setCookie(_cookie),
-    getCsrf: () => UserData.getCsrf(),
-    setCsrf: _csrf => UserData.setCsrf(_csrf),
-    getSESSDATA: () => UserData.getSESSDATA(),
-    getUid: () => UserData.getUid(),
-    importCookieAndCsrf: (_cookie, _csrf) => {
-      return UserData.setCookie(_cookie) && UserData.setCsrf(_csrf);
-    },
-    isLogin: () => Login.isLogin(),
-    checkLoginStatus: () => Login.checkLoginStatus(),
-    getQrcodeKey: () => Login.getQrcodeKey(),
-    loginByQrcode: _qrcodeKey => Login.loginByQrcode(_qrcodeKey),
-    logout: () => Login.logout()
-  };
+  Login = new LoginService();
+function checkLoginDataStatus() {
+  let failCount = 0;
+  const accessKey = UserData.getAccesskey(),
+    cookie = UserData.getCookie(),
+    uid = UserData.getUid(),
+    csrf = UserData.getCsrf(),
+    result = {
+      count: failCount,
+      data: {
+        access_key: {
+          value: accessKey,
+          fail: false
+        },
+        cookie: {
+          value: cookie,
+          fail: false
+        },
+        csrf: {
+          value: csrf,
+          fail: false
+        },
+        uid: {
+          value: uid,
+          fail: false
+        }
+      }
+    };
+  if (!hasString(accessKey)) {
+    failCount += 1;
+    result.data.access_key.fail = true;
+  }
+  if (!hasString(cookie)) {
+    failCount += 1;
+    result.data.cookie.fail = true;
+  }
+  if (!hasString(csrf)) {
+    failCount += 1;
+    result.data.csrf.fail = true;
+  }
+  if (!hasString(uid)) {
+    failCount += 1;
+    result.data.uid.fail = true;
+  }
+  result.count = failCount;
+  $console.info({
+    result
+  });
+  return result;
+}
+const accountService = {
+  getCookie: () => UserData.getCookie(),
+  setCookie: _cookie => UserData.setCookie(_cookie),
+  getCsrf: () => UserData.getCsrf(),
+  setCsrf: _csrf => UserData.setCsrf(_csrf),
+  getSESSDATA: () => UserData.getSESSDATA(),
+  getUid: () => UserData.getUid(),
+  getAccesskey: () => UserData.getAccesskey(),
+  setAccesskey: accesskey => UserData.setAccesskey(accesskey),
+  importCookieAndCsrf: (_cookie, _csrf) => {
+    return UserData.setCookie(_cookie) && UserData.setCsrf(_csrf);
+  },
+  isLogin: () => Login.isLogin(),
+  checkLoginStatus: () => Login.checkLoginStatus(),
+  getQrcodeKey: () => Login.getQrcodeKey(),
+  loginByQrcode: _qrcodeKey => Login.loginByQrcode(_qrcodeKey),
+  logout: () => Login.logout(),
+  checkLoginDataStatus
+};
 module.exports = accountService;
