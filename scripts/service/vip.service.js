@@ -1,4 +1,4 @@
-const { getCookie, getCsrf, getSESSDATA } = require("./account.service");
+const { getCookie, getCsrf } = require("./account.service");
 const { HttpService } = require("./http.service");
 const Http = new HttpService();
 class VipCenter {
@@ -31,13 +31,10 @@ class VipTask {
       const url = "https://api.bilibili.com/pgc/activity/score/task/sign";
       Http.postThen({
         url,
-        body: {
-          csrf: getCsrf()
-        },
         header: {
           Cookie: getCookie(),
           "Content-Type": "application/x-www-form-urlencoded",
-          "Referer": "www.bilibili.com"
+          "Referer": "https://big.bilibili.com/mobile/bigPoint/task"
         }
       })
         .then(resp => {

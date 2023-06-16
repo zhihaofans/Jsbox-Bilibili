@@ -129,10 +129,12 @@ class VipPage {
       .then(result => {
         $ui.loading(false);
         $console.info(result);
+        result.code === 0 ? $ui.success("签到成功") : $ui.error("签到失败");
       })
       .catch(fail => {
         $ui.loading(false);
         $console.error(fail);
+        $ui.error("error");
       });
   }
 }
