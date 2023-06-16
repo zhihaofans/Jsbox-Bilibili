@@ -21,8 +21,11 @@ class VideoList {
           case "pgc":
             authorTitle = thisVideo.show_title + viewProgress;
             break;
-          default:
+          case "archive":
             authorTitle = "@" + thisVideo.author_name + viewProgress;
+            break;
+          default:
+            authorTitle = thisVideo.author_name;
         }
         if (thisVideo.badge) {
           authorTitle += `\n[${thisVideo.badge}]`;
@@ -51,6 +54,10 @@ class VideoList {
               break;
             case "article":
               AppService.openArticle(videoItem.kid);
+              break;
+            case "live":
+              $console.info(videoItem);
+              $app.openURL(videoItem.uri);
               break;
             default:
               AppService.openVideo(videoItem.bvid);
