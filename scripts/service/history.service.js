@@ -1,9 +1,10 @@
 const { HttpService } = require("./http.service");
 const AccountService = require("./account.service");
 class LaterToView {
-  constructor(cookie, csrf) {
+  constructor(cookie, csrf, access_key) {
     this.Cookie = cookie;
     this.Csrf = csrf;
+    this.AccessKey = access_key;
     this.HttpService = new HttpService();
   }
   getLaterToView() {
@@ -19,6 +20,34 @@ class LaterToView {
           const result = resp.data;
           if (result !== undefined || result.code == 0) {
             resolve(result.data);
+          } else {
+            reject(result);
+          }
+        })
+        .catch(error => {
+          $console.error(error);
+          reject(error);
+        });
+    });
+  }
+  addLaterToView(bvid) {
+    return new Promise((resolve, reject) => {
+      const url = "https://api.bilibili.com/x/v2/history/toview/add";
+      this.HttpService.postThen({
+        url,
+        body: {
+          csrf: this.Csrf,
+          bvid,
+          access_key: this.AccessKey
+        },
+        headers: {
+          cookie: this.Cookie
+        }
+      })
+        .then(resp => {
+          const result = resp.data;
+          if (result !== undefined || result.code === 0) {
+            resolve(result);
           } else {
             reject(result);
           }
@@ -61,11 +90,21 @@ class WatchHistory {
 }
 class HistoryService {
   constructor() {
+    this.LOGIN_DATA = {
+      ACCESSKEY: AccountService.getAccesskey(),
+      COOKIE: AccountService.getCookie(),
+      CSRF: AccountService.getCsrf()
+    };
+    $console.info(this.LOGIN_DATA);
     this.HttpService = new HttpService();
-    this.WatchHistory = new WatchHistory(AccountService.getCookie());
+    this.WatchHistory = new WatchHistory(
+      this.LOGIN_DATA.COOKIE,
+      this.LOGIN_DATA.CSRF
+    );
     this.LaterToView = new LaterToView(
-      AccountService.getCookie(),
-      AccountService.getCsrf()
+      this.LOGIN_DATA.COOKIE,
+      this.LOGIN_DATA.CSRF,
+      this.LOGIN_DATA.ACCESSKEY
     );
   }
   getLaterToViewList() {
@@ -107,6 +146,9 @@ class HistoryService {
         }
       );
     });
+  }
+  addLaterToView(bvid) {
+    return this.LaterToView.addLaterToView(bvid);
   }
 }
 module.exports = HistoryService;
