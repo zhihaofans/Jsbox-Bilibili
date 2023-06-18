@@ -76,16 +76,16 @@ class HttpService {
       }
     });
   }
-  getThen({ url, params, header }) {
+  getThen({ url, params, header, headers }) {
     return $http.get({
       url: concatUrlParams(url, params),
-      header
+      header: header || headers
     });
   }
-  postThen({ url, params, header, body }) {
+  postThen({ url, params, header, body, headers }) {
     return $http.post({
       url: concatUrlParams(url, params),
-      header,
+      header: header || headers,
       body
     });
   }
