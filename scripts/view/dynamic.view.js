@@ -2,21 +2,31 @@ const { getDynamicList } = require("../service/dynamic.service");
 const { DynamicItemData } = require("../model/dynamic.model");
 const AppService = require("../service/app.service");
 const PostDetailView = require("./post.detail.view");
+const HistoryView = require("./history.view");
 const { openDynamic } = require("../service/app.service");
 function showDynamicList(title, dynamicListData) {
   const itemList = dynamicListData.map(dynamicItem => {
-      //      $console.info({
-      //        thisVideo
-      //      });
+      const typeStrList = {
+          8: "视频",
+          4308: "直播",
+          2: "图文",
+          1: "转发",
+          4: "文字",
+          0: "文章",
+          512: "番剧",
+          64: "视频笔记"
+        },
+        typeStr = typeStrList[dynamicItem.dynamic_type] || "未知";
+
       return {
         labelTitle: {
           text: dynamicItem.text || "开发中"
         },
         labelAuthor: {
-          text: "@" + dynamicItem.uname
+          text: "@" + dynamicItem.uname + "\n" + `[${typeStr}]`
         },
         imageCover: {
-          src: dynamicItem.image
+          src: dynamicItem.image + "@1q.webp"
         }
       };
     }),
@@ -29,6 +39,11 @@ function showDynamicList(title, dynamicListData) {
         AppService.openVideo(dynamicItem.bvid);
       } else {
         switch (dynamicItem.dynamic_type) {
+          case 512:
+          case 11:
+          case 64:
+            $app.openURL(dynamicItem.url);
+            break;
           default:
             $ui.alert({
               title: dynamicItem.uname,
@@ -92,7 +107,7 @@ function showDynamicList(title, dynamicListData) {
             $console.info(indexPath);
             const selectItem = dynamicListData[indexPath.row];
             $ui.menu({
-              items: ["获取封面", "获取信息"],
+              items: ["获取封面", "获取信息", "添加到稍后再看"],
               handler: (title, idx) => {
                 switch (idx) {
                   case 0:
@@ -119,6 +134,13 @@ function showDynamicList(title, dynamicListData) {
                       $ui.warning("开发中");
                     }
                     break;
+                  case 2:
+                    if (selectItem.dynamic_type === 8) {
+                      new HistoryView().addLaterToView(selectItem.bvid);
+                    } else {
+                      $ui.error("仅支持视频");
+                    }
+                    break;
                   default:
                 }
               }
@@ -136,9 +158,18 @@ function init() {
       $ui.loading(false);
       $console.info(result);
       if (result.code === 0) {
-        const dynamicList = result.data.cards.map(
-          item => new DynamicItemData(item)
-        );
+        const dynamicList = result.data.cards.map(item => {
+          try {
+            const _result = new DynamicItemData(item);
+            return _result;
+          } catch (error) {
+            $console.error("===发生错误");
+            $console.error(error);
+            $console.error(item);
+            $console.error("错误结束===");
+            return undefined;
+          }
+        });
 
         $console.info(dynamicList);
         showDynamicList("动态", dynamicList);

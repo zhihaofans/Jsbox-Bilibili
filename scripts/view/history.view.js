@@ -3,6 +3,7 @@ const HistoryService = require("../service/history.service");
 const { ListView } = require("../util/View");
 const AppService = require("../service/app.service");
 const PostDetailView = require("./post.detail.view");
+const { hasString } = require("../util/String");
 class VideoList {
   constructor() {
     this.ListView = new ListView();
@@ -38,7 +39,7 @@ class VideoList {
             text: authorTitle
           },
           imageCover: {
-            src: thisVideo.cover_image
+            src: thisVideo.cover_image + "@1q.webp"
           }
         };
       }),
@@ -160,6 +161,71 @@ class HistoryView {
   constructor() {
     this.HistoryService = new HistoryService();
     this.ListView = new ListView();
+  }
+  addLaterToView(bvid) {
+    if (hasString(bvid)) {
+      this.HistoryService.addLaterToView(bvid)
+        .then(result => {
+          $console.info({
+            addLaterToView: bvid,
+            result
+          });
+
+          if (result.code === 0) {
+            $ui.success("ok");
+          } else {
+            $ui.alert({
+              title: "失败",
+              message: result.message,
+              actions: [
+                {
+                  title: "OK",
+                  disabled: false, // Optional
+                  handler: () => {}
+                },
+                {
+                  title: "Cancel",
+                  handler: () => {}
+                }
+              ]
+            });
+          }
+        })
+        .catch(fail => {
+          $console.error(fail);
+          $ui.alert({
+            title: "添加到稍后再看失败",
+            message: fail.message || "未知错误",
+            actions: [
+              {
+                title: "OK",
+                disabled: false, // Optional
+                handler: () => {}
+              },
+              {
+                title: "Cancel",
+                handler: () => {}
+              }
+            ]
+          });
+        });
+    } else {
+      $ui.alert({
+        title: "添加到稍后再看失败",
+        message: "bvid为空",
+        actions: [
+          {
+            title: "OK",
+            disabled: false, // Optional
+            handler: () => {}
+          },
+          {
+            title: "Cancel",
+            handler: () => {}
+          }
+        ]
+      });
+    }
   }
   showLaterToView() {
     $ui.loading(true);
