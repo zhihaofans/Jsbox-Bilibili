@@ -37,11 +37,11 @@ class LaterToView {
         url,
         body: {
           csrf: this.Csrf,
-          bvid,
-          access_key: this.AccessKey
+          bvid
         },
-        headers: {
-          cookie: this.Cookie
+        header: {
+          cookie: this.Cookie,
+          "Content-Type": "application/x-www-form-urlencoded"
         }
       })
         .then(resp => {
