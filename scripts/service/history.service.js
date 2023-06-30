@@ -1,10 +1,65 @@
 const { HttpService } = require("./http.service");
 const AccountService = require("./account.service");
+class Favorite {
+  constructor() {
+    this.Cookie = AccountService.getCookie();
+    this.Uid = AccountService.getUid();
+    this.HttpService = new HttpService();
+  }
+  getFavList() {
+    return new Promise((resolve, reject) => {
+      const url = "https://api.bilibili.com/x/v3/fav/folder/created/list-all";
+      this.HttpService.getThen({
+        url,
+        params: {
+          up_mid: this.Uid
+        },
+        header: {
+          cookie: this.Cookie
+        }
+      })
+        .then(resp => {
+          const result = resp.data;
+          if (result.code === 0) {
+            resolve(result.data);
+          } else {
+            reject(result);
+          }
+        })
+        .catch(reject);
+    });
+  }
+  getFavContent(fav_id) {
+    $console.info(fav_id);
+    return new Promise((resolve, reject) => {
+      const url = `https://api.bilibili.com/x/v3/fav/resource/list`;
+      this.HttpService.getThen({
+        url,
+        params:{
+          media_id:fav_id,
+          ps:20
+        },
+        header: {
+          cookie: this.Cookie
+        }
+      })
+        .then(resp => {
+          const result = resp.data;
+          if (result.code === 0) {
+            resolve(result.data);
+          } else {
+            reject(result);
+          }
+        })
+        .catch(reject);
+    });
+  }
+}
 class LaterToView {
-  constructor(cookie, csrf, access_key) {
-    this.Cookie = cookie;
-    this.Csrf = csrf;
-    this.AccessKey = access_key;
+  constructor() {
+    this.Cookie = AccountService.getCookie();
+    this.Csrf = AccountService.getCsrf();
+    this.AccessKey = AccountService.getAccesskey();
     this.HttpService = new HttpService();
   }
   getLaterToView() {
@@ -58,10 +113,38 @@ class LaterToView {
         });
     });
   }
+  removeLaterToView(avid) {
+    return new Promise((resolve, reject) => {
+      const url = "https://api.bilibili.com/x/v2/history/toview/del";
+      this.HttpService.postThen({
+        url,
+        body: {
+          csrf: this.Csrf,
+          avid
+        },
+        header: {
+          cookie: this.Cookie,
+          "Content-Type": "application/x-www-form-urlencoded"
+        }
+      })
+        .then(resp => {
+          const result = resp.data;
+          if (result !== undefined || result.code === 0) {
+            resolve(result);
+          } else {
+            reject(result);
+          }
+        })
+        .catch(error => {
+          $console.error(error);
+          reject(error);
+        });
+    });
+  }
 }
 class WatchHistory {
-  constructor(cookie) {
-    this.Cookie = cookie;
+  constructor() {
+    this.Cookie = AccountService.getCookie();
     this.HttpService = new HttpService();
   }
   getWatchHistory(pageSize = 30) {
@@ -90,22 +173,9 @@ class WatchHistory {
 }
 class HistoryService {
   constructor() {
-    this.LOGIN_DATA = {
-      ACCESSKEY: AccountService.getAccesskey(),
-      COOKIE: AccountService.getCookie(),
-      CSRF: AccountService.getCsrf()
-    };
-    $console.info(this.LOGIN_DATA);
-    this.HttpService = new HttpService();
-    this.WatchHistory = new WatchHistory(
-      this.LOGIN_DATA.COOKIE,
-      this.LOGIN_DATA.CSRF
-    );
-    this.LaterToView = new LaterToView(
-      this.LOGIN_DATA.COOKIE,
-      this.LOGIN_DATA.CSRF,
-      this.LOGIN_DATA.ACCESSKEY
-    );
+    this.WatchHistory = new WatchHistory();
+    this.LaterToView = new LaterToView();
+    this.Favorite = new Favorite();
   }
   getLaterToViewList() {
     return new Promise((resolve, reject) => {
@@ -149,6 +219,12 @@ class HistoryService {
   }
   addLaterToView(bvid) {
     return this.LaterToView.addLaterToView(bvid);
+  }
+  getFavoriteList() {
+    return this.Favorite.getFavList();
+  }
+  getFavoriteContent(favId) {
+    return this.Favorite.getFavContent(favId);
   }
 }
 module.exports = HistoryService;

@@ -194,6 +194,9 @@ function showAboutmeView(navData) {
         didSelect(sender, indexPath, data) {
           $console.info(indexPath, data);
           switch (indexPath.row) {
+            case 0:
+              HistoryView.getFavoriteList();
+              break;
             case 1:
               HistoryView.showLaterToView();
               break;

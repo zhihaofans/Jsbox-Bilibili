@@ -4,7 +4,6 @@ class PublishItemData {
     this.author_mid = videoData.owner?.mid || videoData.author_mid;
     this.author_name = videoData.owner?.name || videoData.author_name;
     this.avid = videoData.aid || videoData.history?.avid;
-
     this.business = videoData.history?.business || "archive"; //历史类型：archive：稿件，pgc：剧集（番剧 / 影视），live：直播，article-list：文集，article：文章
     switch (this.business) {
       case "live":
@@ -51,6 +50,23 @@ class PublishItemData {
     this.uri = videoData.uri;
   }
 }
-module.exports = {
-  PublishItemData
-};
+class FavoriteItem {
+  constructor(favoriteData) {
+    //$console.info(favoriteData);
+    // favorite info
+    this.id = favoriteData.id;
+    this.image = favoriteData.cover;
+    this.link = favoriteData.link;
+    this.title = favoriteData.title;
+    this.favorite_type = favoriteData.type;
+
+    // upper info
+    this.uid = favoriteData.upper.mid;
+    this.uname = favoriteData.upper.name;
+    this.uface = favoriteData.upper.face;
+
+    // video info
+    this.bvid = favoriteData.bvid || favoriteData.bv_id;
+  }
+}
+module.exports = { FavoriteItem, PublishItemData };

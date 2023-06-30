@@ -17,7 +17,6 @@ function showDynamicList(title, dynamicListData) {
           64: "视频笔记"
         },
         typeStr = typeStrList[dynamicItem.dynamic_type] || "未知";
-
       return {
         labelTitle: {
           text: dynamicItem.text || "开发中"

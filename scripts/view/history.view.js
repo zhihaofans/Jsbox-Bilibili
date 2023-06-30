@@ -1,4 +1,4 @@
-const { PublishItemData } = require("../model/history.model");
+const { FavoriteItem, PublishItemData } = require("../model/history.model");
 const HistoryService = require("../service/history.service");
 const { ListView } = require("../util/View");
 const AppService = require("../service/app.service");
@@ -7,6 +7,109 @@ const { hasString } = require("../util/String");
 class VideoList {
   constructor() {
     this.ListView = new ListView();
+  }
+  showFavoriteList(favTitle, favoriteList) {
+    const itemList = favoriteList.map(favItem => {
+        //      $console.info({
+        //        thisVideo
+        //      });
+
+        return {
+          labelTitle: {
+            text: favItem.title
+          },
+          labelAuthor: {
+            text: `@${favItem.uname}`
+          },
+          imageCover: {
+            src: favItem.image
+          }
+        };
+      }),
+      didSelect = (section, row) => {
+        const favItem = favoriteList[row];
+        $console.info({
+          favItem
+        });
+        $app.openURL(favItem.link);
+      };
+    $console.info(itemList);
+    const later2watchNavMenu = [
+      {
+        title: "菜单",
+        symbol: "command", // SF symbols are supported
+        handler: sender => {
+          $ui.alert("Tapped!");
+        },
+        menu: {
+          title: "长按菜单",
+          items: [
+            {
+              title: "移除看完视频",
+              handler: sender => {}
+            }
+          ]
+        } // Pull-Down menu
+      }
+    ];
+    $ui.push({
+      props: {
+        title: favTitle
+        //        navButtons: isHistory !== true ? later2watchNavMenu : undefined
+      },
+      views: [
+        {
+          type: "matrix",
+          props: {
+            id: "postList",
+            columns: 1,
+            itemHeight: 80, //每行高度
+            square: false,
+            spacing: 2, //间隔
+            template: require("./components/post.item.template"),
+            data: itemList,
+            header: {
+              type: "label",
+              props: {
+                height: 20,
+                text: `共${favoriteList.length || 0}个收藏`,
+                textColor: $color("#AAAAAA"),
+                align: $align.center,
+                font: $font(12)
+              }
+            },
+            footer: {
+              type: "label",
+              props: {
+                height: 20,
+                text: "温馨提示:长按有个菜单",
+                textColor: $color("#AAAAAA"),
+                align: $align.center,
+                font: $font(12)
+              }
+            }
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (sender, indexPath, data) =>
+              didSelect(indexPath.section, indexPath.row),
+            didLongPress: (sender, indexPath, data) => {
+              $console.info(indexPath);
+              const selectItem = favoriteList[indexPath.row];
+              $ui.menu({
+                items: ["获取封面", "获取信息"],
+                handler: (title, idx) => {
+                  switch (idx) {
+                    default:
+                      $ui.error("?!");
+                  }
+                }
+              });
+            }
+          }
+        }
+      ]
+    });
   }
   showVideoListNew(title, videoList, isHistory = false) {
     const itemList = videoList.map(thisVideo => {
@@ -130,7 +233,7 @@ class VideoList {
               $console.info(indexPath);
               const selectItem = videoList[indexPath.row];
               $ui.menu({
-                items: ["获取封面", "获取信息"],
+                items: ["获取封面", "获取信息", "一键投币"],
                 handler: (title, idx) => {
                   switch (idx) {
                     case 0:
@@ -147,6 +250,7 @@ class VideoList {
                       }
                       break;
                     default:
+                      $ui.error("?!");
                   }
                 }
               });
@@ -161,6 +265,7 @@ class HistoryView {
   constructor() {
     this.HistoryService = new HistoryService();
     this.ListView = new ListView();
+    this.VideoList = new VideoList();
   }
   addLaterToView(bvid) {
     if (hasString(bvid)) {
@@ -314,6 +419,64 @@ class HistoryView {
         }
       }
     );
+  }
+  getFavoriteList() {
+    this.HistoryService.getFavoriteList()
+      .then(result => {
+        $console.info(result);
+        if (result.count > 0) {
+          const favList = result.list;
+          $ui.push({
+            props: {
+              title: `${result.count}个收藏夹`
+            },
+            views: [
+              {
+                type: "list",
+                props: {
+                  data: favList.map(
+                    favItem => `${favItem.title}(${favItem.id})`
+                  )
+                },
+                layout: $layout.fill,
+                events: {
+                  didSelect: (sender, indexPath, data) => {
+                    const favItem = favList[indexPath.row];
+                    $console.info({
+                      favItem
+                    });
+                    this.HistoryService.getFavoriteContent(favItem.id)
+                      .then(favContentResult => {
+                        $console.info(favContentResult);
+                        const favContentList = favContentResult.medias,
+                          favTitle = favContentResult.info.title;
+                        if (
+                          favContentResult.info.media_count > 0 &&
+                          favContentList.length > 0
+                        ) {
+                          this.VideoList.showFavoriteList(
+                            favTitle,
+                            favContentList.map(item => new FavoriteItem(item))
+                          );
+                        } else {
+                          $ui.error("这个收藏夹没有内容");
+                        }
+                      })
+                      .catch(favContentFail => {
+                        $console.error(favContentFail);
+                      });
+                  }
+                }
+              }
+            ]
+          });
+        } else {
+          $ui.error("没有收藏夹");
+        }
+      })
+      .catch(fail => {
+        $console.error(fail);
+      });
   }
 }
 module.exports = HistoryView;
