@@ -3,6 +3,8 @@ const VipView = require("./vip.view");
 const { showErrorAlertAndExit } = require("../util/JSBox");
 const COLOR = require("../config/color");
 const { LoginView } = require("./account.view");
+const EmoteService = require("../service/emote.service");
+const $ = require("$");
 class MainView {
   constructor() {
     this.ListView = new ListView();
@@ -11,10 +13,61 @@ class MainView {
     this.MangaView = require("./manga.view");
     this.DynamicView = require("./dynamic.view");
   }
+  getEmoteList() {
+    try {
+      $.startLoading();
+      EmoteService.getAllEmoteList()
+        .then(result => {
+          $console.info(result);
+          $ui.push({
+            props: {
+              title: "listview"
+            },
+            views: [
+              {
+                type: "list",
+                props: {
+                  data: result.packages.map(emoteItem => emoteItem.text)
+                },
+                layout: $layout.fill,
+                events: {
+                  didSelect: (sender, indexPath, data) => {
+                    const { section, row } = indexPath;
+                    const emoteItem = result.packages[row];
+                    $console.info(emoteItem);
+                    const emoteList = emoteItem.emote;
+                    require("./content.view").openImage({
+                      id: "imageEmoteList",
+                      title: emoteItem.text,
+                      imageList: emoteList.map(item => item.url + "@1q.webp"),
+                      onClick: index => {
+                        $.startLoading();
+                        $quicklook.open({
+                          url: emoteList[index].url
+                        });
+                        $.stopLoading();
+                      }
+                    });
+                  }
+                }
+              }
+            ]
+          });
+        })
+        .catch(fail => {
+          $console.error(fail);
+        })
+        .finally(() => {
+          $.stopLoading();
+        });
+    } catch (error) {
+      $console.error(error);
+    }
+  }
   init() {
     try {
       const title = "哔哩哔哩(已登录)",
-        textList = ["漫画签到", "动态", "test"],
+        textList = ["漫画签到", "动态", "login data test", "emote test"],
         didSelect = index => {
           switch (index) {
             case 0:
@@ -29,6 +82,9 @@ class MainView {
               } catch (error) {
                 $console.error(error);
               }
+              break;
+            case 3:
+              this.getEmoteList();
               break;
             default:
               $ui.error("?");
