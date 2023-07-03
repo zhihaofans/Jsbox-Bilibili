@@ -1,4 +1,4 @@
-const httpService = require("./http.service");
+const Http = require("./http.service");
 const { getCookie } = require("./account.service");
 const { hasString } = require("../util/String");
 class ExampleService {
@@ -7,41 +7,49 @@ class ExampleService {
     return new Promise((resolve, reject) => {});
   }
 }
-class HttpExampleService {
-  constructor() {}
-  getThen() {
-    const url = "";
-    return new Promise((resolve, reject) => {
-      httpService.Http.getThen({
-        url,
-        header: {
-          cookie: getCookie()
-        }
+
+function getThen() {
+  const url = "";
+  return new Promise((resolve, reject) => {
+    Http.getThen({
+      url,
+      params: {
+        aaa: "bbb"
+      },
+      header: {
+        cookie: getCookie()
+      }
+    })
+      .then(result => {
+        resolve(result.data);
       })
-        .then(result => {
-          resolve(result.data);
-        })
-        .catch(fail => reject(fail));
-    });
-  }
-  postThen() {
-    const url = "";
-    return new Promise((resolve, reject) => {
-      httpService.Http.getThen({
-        url,
-        header: {
-          cookie: getCookie()
-        }
+      .catch(fail => reject(fail));
+  });
+}
+function postThen() {
+  const url = "";
+  return new Promise((resolve, reject) => {
+    Http.getThen({
+      url,
+      params: {
+        aaa: "bbb"
+      },
+      body: {
+        bbb: "aaa"
+      },
+      header: {
+        cookie: getCookie()
+      }
+    })
+      .then(result => {
+        resolve(result.data);
       })
-        .then(result => {
-          resolve(result.data);
-        })
-        .catch(fail => reject(fail));
-    });
-  }
+      .catch(fail => reject(fail));
+  });
 }
 
 module.exports = {
   ExampleService,
-  HttpExampleService
+  getThen,
+  postThen
 };
