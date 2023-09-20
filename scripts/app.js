@@ -141,6 +141,7 @@ function init() {
     }
   } catch (error) {
     $console.error(error);
+    $ui.loading(false);
     $ui.alert({
       title: "‼️",
       message: error.message,

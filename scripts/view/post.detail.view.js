@@ -1,18 +1,49 @@
-const { VideoInfoService } = require("../service/video.service"),
+const VideoService = require("../service/video.service"),
   { ViewKit, ViewTemplate } = require("../util/View");
+class Downloader {
+  constructor() {}
+  startDownload(videoInfo) {
+    if (videoInfo) {
+      const { bvid, pages } = videoInfo;
+      $ui.push({
+        props: {
+          title: `下载视频(${pages.length}个分P)`
+        },
+        views: [
+          {
+            type: "list",
+            props: {
+              data: pages.map(part => part.part)
+            },
+            layout: $layout.fill,
+            events: {
+              didSelect: (sender, indexPath, data) => {
+                const videoPart = pages[indexPath.row];
+                VideoService.downloadVideo(bvid, videoPart.cid);
+              }
+            }
+          }
+        ]
+      });
+    } else {
+      $ui.error("视频信息空白");
+    }
+  }
+}
 class PostDetailView {
   constructor() {
-    this.VideoInfoService = new VideoInfoService();
     this.ViewKit = new ViewKit();
+    this.Downloader = new Downloader();
   }
   showVideoDetail(bvid) {
     $ui.loading(true);
-    this.VideoInfoService.getVideoInfo(bvid)
+    VideoService.getVideoInfo(bvid)
       .then(result => {
         $console.info(result);
         $ui.loading(false);
         if (result.code === 0) {
           const videoInfo = result.data;
+          $console.info(videoInfo.pages);
           $ui.push({
             props: {
               title: "video"
@@ -20,14 +51,14 @@ class PostDetailView {
             views: [
               ViewTemplate.getImage({
                 id: "imageCover",
-                src: videoInfo.pic,
+                src: videoInfo.pic + "@1q.webp",
                 layout: (make, view) => {
                   make.left.top.right.inset(10);
                   make.width.equalTo(view.width);
                   make.height.equalTo(200);
                 },
                 tapped: sender => {
-                  $console.info(sender.src);
+                  $console.info(videoInfo.pic);
                 }
               }),
               ViewTemplate.getLabel({
@@ -55,6 +86,18 @@ class PostDetailView {
                 },
                 tapped: sender => {
                   $console.info(sender.text);
+                }
+              }),
+              ViewTemplate.getButton({
+                id: "buttonDownload",
+
+                title: "下载视频",
+                layout: (make, view) => {
+                  make.top.greaterThanOrEqualTo($("labelVideoTitle").bottom);
+                  make.centerX.equalTo(view.super);
+                },
+                tapped: () => {
+                  this.Downloader.startDownload(videoInfo);
                 }
               })
             ]
