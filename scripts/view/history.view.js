@@ -13,7 +13,6 @@ class VideoList {
         //      $console.info({
         //        thisVideo
         //      });
-
         return {
           labelTitle: {
             text: favItem.title

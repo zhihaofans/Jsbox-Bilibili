@@ -250,9 +250,6 @@ class MainView {
           }
         }
       ];
-      $console.info({
-        ViewData
-      });
       this.ViewKit.showView({
         props: {
           title

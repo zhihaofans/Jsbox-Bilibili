@@ -1,5 +1,7 @@
+const $$ = require("$");
 const VideoService = require("../service/video.service"),
-  { ViewKit, ViewTemplate } = require("../util/View");
+  { ViewKit, ViewTemplate } = require("../util/View"),
+  { AUDIO_QUALITY_STR, VIDEO_QUALITY_STR } = require("../model/video.model");
 class Downloader {
   constructor() {}
   startDownload(videoInfo) {
@@ -19,7 +21,97 @@ class Downloader {
             events: {
               didSelect: (sender, indexPath, data) => {
                 const videoPart = pages[indexPath.row];
-                VideoService.downloadVideo(bvid, videoPart.cid);
+                $$.startLoading();
+                VideoService.downloadVideo(bvid, videoPart.cid)
+                  .then(result => {
+                    $console.info(result);
+                    $$.stopLoading();
+                    const { data } = result;
+                    if (result.code === 0 && data.result === "suee") {
+                      const videoDash = data.dash;
+
+                      $ui.push({
+                        props: {
+                          title: "音视频分开下载"
+                        },
+                        views: [
+                          {
+                            type: "list",
+                            props: {
+                              data: [
+                                {
+                                  title: "视频",
+                                  rows: videoDash.video.map(
+                                    v =>
+                                      `${VIDEO_QUALITY_STR[v.id.toString()]}/${
+                                        v.width
+                                      }x${v.height}(${v.frameRate}fps)/${
+                                        v.codecs
+                                      }`
+                                  )
+                                },
+                                {
+                                  title: "音频",
+                                  rows: videoDash.audio.map(
+                                    a =>
+                                      `${AUDIO_QUALITY_STR[a.id.toString()]}(${
+                                        a.id
+                                      })`
+                                  )
+                                }
+                              ]
+                            },
+                            layout: $layout.fill,
+                            events: {
+                              didSelect: (sender, indexPath, data) => {
+                                const { section, row } = indexPath;
+                                switch (section) {
+                                  case 0:
+                                    $input.text({
+                                      type: $kbType.text,
+                                      placeholder: "",
+                                      text: videoDash.video[row].baseUrl,
+                                      handler: text => {}
+                                    });
+                                    break;
+                                  case 1:
+                                    $input.text({
+                                      type: $kbType.text,
+                                      placeholder: "",
+                                      text: videoDash.audio[row].baseUrl,
+                                      handler: text => {}
+                                    });
+                                    break;
+                                  default:
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      });
+                    } else {
+                      $ui.alert({
+                        title: "失败",
+                        message: result.message || data.message || "未知错误",
+                        actions: [
+                          {
+                            title: "OK",
+                            disabled: false, // Optional
+                            handler: () => {}
+                          },
+                          {
+                            title: "Cancel",
+                            handler: () => {}
+                          }
+                        ]
+                      });
+                    }
+                  })
+                  .catch(fail => {
+                    $$.stopLoading();
+                    $ui.error("加载失败");
+                    $console.error(fail);
+                  });
               }
             }
           }

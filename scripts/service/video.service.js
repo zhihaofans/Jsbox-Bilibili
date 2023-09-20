@@ -13,13 +13,22 @@ class VideoDownloader {
           bvid,
           cid,
           fourk: 1,
-          fnval: 1,
-          qn: 112
+          fnval: 16,
+          fnver: 0
         },
         header: {
-          cookie: AccountService.getCookie()
+          Cookie: AccountService.getCookie()
         }
-      });
+      })
+        .then(result => {
+          $console.info({
+            bvid,
+            cid,
+            downloadWebVideo: result.data
+          });
+          resolve(result.data);
+        })
+        .catch(reject);
     });
   }
   getCidList(bvid) {}

@@ -30,7 +30,7 @@ function showAboutmeView(navData) {
     moneyData = [
       {
         labelNumber: {
-          text: navData.money || "无"
+          text: Number(navData.money).toFixed(2) || "0"
         },
         labelTitle: {
           text: "硬币"
@@ -38,7 +38,7 @@ function showAboutmeView(navData) {
       },
       {
         labelNumber: {
-          text: navData.wallet.bcoin_balance || "无"
+          text: Number(navData.wallet.bcoin_balance).toFixed(2) || "无"
         },
         labelTitle: {
           text: "B币"
@@ -46,10 +46,10 @@ function showAboutmeView(navData) {
       },
       {
         labelNumber: {
-          text: "0"
+          text: "?"
         },
         labelTitle: {
-          text: "其他"
+          text: "电池"
         }
       }
     ],
