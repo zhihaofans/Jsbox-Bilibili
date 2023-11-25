@@ -4,6 +4,7 @@ const { showErrorAlertAndExit } = require("../util/JSBox");
 const COLOR = require("../config/color");
 const { LoginView } = require("./account.view");
 const EmoteService = require("../service/emote.service");
+const LiveService = require("../service/live.service");
 const $ = require("$");
 class MainView {
   constructor() {
@@ -32,7 +33,7 @@ class MainView {
                 layout: $layout.fill,
                 events: {
                   didSelect: (sender, indexPath, data) => {
-                    const { section, row } = indexPath;
+                    const { /*section, */ row } = indexPath;
                     const emoteItem = result.packages[row];
                     $console.info(emoteItem);
                     const emoteList = emoteItem.emote;
@@ -67,7 +68,13 @@ class MainView {
   init() {
     try {
       const title = "哔哩哔哩(已登录)",
-        textList = ["漫画签到", "动态", "login data test", "emote test"],
+        textList = [
+          "漫画签到",
+          "动态",
+          "login data test",
+          "emote test",
+          "直播签到"
+        ],
         didSelect = index => {
           switch (index) {
             case 0:
@@ -85,6 +92,31 @@ class MainView {
               break;
             case 3:
               this.getEmoteList();
+              break;
+            case 4:
+              $.startLoading();
+              new LiveService()
+                .checkIn()
+                .then(result => {
+                  $.stopLoading();
+                  $console.info(result);
+                  $ui.alert({
+                    title: "直播签到" + result.code,
+                    message: result.message,
+                    actions: [
+                      {
+                        title: "OK",
+                        disabled: false, // Optional
+                        handler: () => {}
+                      }
+                    ]
+                  });
+                })
+                .catch(fail => {
+                  $.stopLoading();
+                  $console.error(fail);
+                  $ui.error("直播签到失败");
+                });
               break;
             default:
               $ui.error("?");
