@@ -3,6 +3,7 @@ const AccountService = require("./account.service");
 class Favorite {
   constructor() {
     this.Cookie = AccountService.getCookie();
+    this.Csrf = AccountService.getCsrf();
     this.Uid = AccountService.getUid();
     this.HttpService = new HttpService();
   }
@@ -35,9 +36,34 @@ class Favorite {
       const url = `https://api.bilibili.com/x/v3/fav/resource/list`;
       this.HttpService.getThen({
         url,
-        params:{
-          media_id:fav_id,
-          ps:20
+        params: {
+          media_id: fav_id,
+          ps: 20
+        },
+        header: {
+          cookie: this.Cookie
+        }
+      })
+        .then(resp => {
+          const result = resp.data;
+          if (result.code === 0) {
+            resolve(result.data);
+          } else {
+            reject(result);
+          }
+        })
+        .catch(reject);
+    });
+  }
+  cleanDieItem(favId) {
+    $console.info(favId);
+    return new Promise((resolve, reject) => {
+      const url = `https://api.bilibili.com/x/v3/fav/resource/clean`;
+      this.HttpService.postThen({
+        url,
+        params: {
+          media_id: favId,
+          csrf: this.Csrf
         },
         header: {
           cookie: this.Cookie

@@ -33,28 +33,38 @@ class VideoList {
         $app.openURL(favItem.link);
       };
     $console.info(itemList);
-    const later2watchNavMenu = [
+    const navMenu = [
       {
-        title: "菜单",
-        symbol: "command", // SF symbols are supported
+        title: "",
+        symbol: "checkmark.seal", // SF symbols are supported
         handler: sender => {
           $ui.alert("Tapped!");
-        },
-        menu: {
-          title: "长按菜单",
-          items: [
-            {
-              title: "移除看完视频",
-              handler: sender => {}
-            }
-          ]
-        } // Pull-Down menu
+          $ui.alert({
+            title: "清空收藏夹里失效的收藏",
+            message: "仅限本收藏夹",
+            actions: [
+              {
+                title: "是",
+                disabled: false, // Optional
+                handler: () => {
+          
+                }
+              },
+              {
+                title: "嫑",
+                handler: () => {
+          
+                }
+              }
+            ]
+          })
+        }
       }
     ];
     $ui.push({
       props: {
-        title: favTitle
-        //        navButtons: isHistory !== true ? later2watchNavMenu : undefined
+        title: favTitle,
+        navButtons: navMenu
       },
       views: [
         {

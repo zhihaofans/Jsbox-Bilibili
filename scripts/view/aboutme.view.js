@@ -3,6 +3,7 @@ const { ViewTemplate } = require("../util/View");
 const HistoryViewObj = require("./history.view");
 const HistoryView = new HistoryViewObj();
 const { showErrorAlertAndExit } = require("../util/JSBox");
+const Get = require("Get");
 function showAboutmeView(navData) {
   const moneyTemplate = [
       {
@@ -84,7 +85,7 @@ function showAboutmeView(navData) {
       },
       layout: (make, view) => {
         //make.bottom.inset(0);
-        make.top.greaterThanOrEqualTo($("labelUname").bottom);
+        make.top.greaterThanOrEqualTo(Get("labelUname").bottom);
         if ($device.info.screen.width > 500) {
           make.width.equalTo(500);
         } else {
@@ -96,6 +97,12 @@ function showAboutmeView(navData) {
       events: {
         didSelect(sender, indexPath, data) {
           $console.info(indexPath, data);
+          switch (indexPath.row) {
+            case 2:
+            $app.openURL("https://link.bilibili.com/p/live-h5-recharge/index.html")
+            break;
+            default:
+          }
         }
       }
     },
@@ -181,7 +188,7 @@ function showAboutmeView(navData) {
       },
       layout: (make, view) => {
         //make.bottom.inset(0);
-        make.top.greaterThanOrEqualTo($("tabMoney").bottom);
+        make.top.greaterThanOrEqualTo(Get("tabMoney").bottom);
         if ($device.info.screen.width > 500) {
           make.width.equalTo(500);
         } else {
@@ -239,7 +246,7 @@ function showAboutmeView(navData) {
               text: navData.uname,
               layout: (make, view) => {
                 make.centerX.equalTo(view.super);
-                make.top.equalTo($("imageUserCover").bottom);
+                make.top.equalTo(Get("imageUserCover").bottom);
               }
             }),
             moneyView,
