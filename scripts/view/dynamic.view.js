@@ -4,17 +4,21 @@ const AppService = require("../service/app.service");
 const PostDetailView = require("./post.detail.view");
 const HistoryView = require("./history.view");
 const { openDynamic } = require("../service/app.service");
+const $ = require("$");
 function showDynamicList(title, dynamicListData) {
   const itemList = dynamicListData.map(dynamicItem => {
       const typeStrList = {
           8: "视频",
           4308: "直播",
-          2: "图文",
+          2: "图片",
           1: "转发",
           4: "文字",
           0: "文章",
           512: "番剧",
-          64: "视频笔记"
+          64: "专栏",
+          256: "音频",
+          2048: "活动",
+          4300: "收藏类动态"
         },
         typeStr = typeStrList[dynamicItem.dynamic_type] || "未知";
       return {
@@ -34,7 +38,7 @@ function showDynamicList(title, dynamicListData) {
       $console.info({
         dynamicItem
       });
-      if (dynamicItem.bvid) {
+      if (dynamicItem.dynamic_type === 8 && dynamicItem.bvid !== undefined) {
         AppService.openVideo(dynamicItem.bvid);
       } else {
         switch (dynamicItem.dynamic_type) {
@@ -49,12 +53,19 @@ function showDynamicList(title, dynamicListData) {
               message: dynamicItem.text,
               actions: [
                 {
-                  title: "OK",
+                  title: "打开动态",
                   disabled: false, // Optional
-                  handler: () => {}
+                  handler: () => {
+                    $safari.open({
+                      url: `https://m.bilibili.com/opus/${dynamicItem.dynamic_id_str}`,
+                      entersReader: true,
+                      height: 360,
+                      handler: function () {}
+                    });
+                  }
                 },
                 {
-                  title: "Cancel",
+                  title: "Bye",
                   handler: () => {}
                 }
               ]
@@ -106,7 +117,13 @@ function showDynamicList(title, dynamicListData) {
             $console.info(indexPath);
             const selectItem = dynamicListData[indexPath.row];
             $ui.menu({
-              items: ["获取封面", "获取信息", "添加到稍后再看"],
+              items: [
+                "获取封面",
+                "获取信息",
+                "添加到稍后再看(视频)",
+                "动态id",
+                "打开动态"
+              ],
               handler: (title, idx) => {
                 switch (idx) {
                   case 0:
@@ -139,6 +156,26 @@ function showDynamicList(title, dynamicListData) {
                     } else {
                       $ui.error("仅支持视频");
                     }
+                    break;
+                  case 3:
+                    $input.text({
+                      type: $kbType.text,
+                      placeholder: "",
+                      text: selectItem.dynamic_id,
+                      handler: text => {
+                        $.copy(text);
+                      }
+                    });
+                    break;
+                  case 4:
+                    const url = `https://m.bilibili.com/opus/${selectItem.dynamic_id_str}`;
+                    $console.info(url);
+                    $safari.open({
+                      url,
+                      entersReader: true,
+                      height: 360,
+                      handler: function () {}
+                    });
                     break;
                   default:
                 }

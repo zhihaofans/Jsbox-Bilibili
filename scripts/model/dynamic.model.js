@@ -5,6 +5,7 @@ class DynamicItemData {
     $console.info(desc);
     // Dynamic info
     this.dynamic_id = desc.dynamic_id;
+    this.dynamic_id_str = desc.dynamic_id_str;
     this.dynamic_type = desc.type; //8:视频,4308:直播,2:图文动态,1:转发,4:文字动态,0:文章,512:番剧,64:视频笔记
     switch (this.dynamic_type) {
       case 64:
