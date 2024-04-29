@@ -1,47 +1,23 @@
-// Web
-const openWebBrowser = url => {
-  if (url) {
-    $app.openURL(`bilibili://browser/?url=${$text.URLEncode(url)}`);
-  } else {
-    throw new Error("空白url");
+function openWeb(url) {
+  const mode = $prefs.get("web.open.mode");
+  switch (mode) {
+    case 1:
+      $app.openURL(url);
+      break;
+    case 0:
+      $safari.open({
+        url,
+        entersReader: true,
+        height: 360,
+        handler: function () {}
+      });
+      break;
+    case 2:
+      require("./bili.service").openWebBrowser(url);
+      break;
+    default:
   }
-};
-
-// Video
-const openVideo = bvid => {
-  if (bvid) {
-    $app.openURL(`bilibili://video/${bvid}`);
-  } else {
-    throw new Error("空白bvid");
-  }
-};
-
-// Bangumi
-const openBangumi = kid => {
-  if (kid) {
-    $app.openURL(`bilibili://bangumi/season/${kid}`);
-  } else {
-    throw new Error("空白kid");
-  }
-};
-// Article
-const openArticle = kid => {
-  if (kid) {
-    $app.openURL(`bilibili://article/${kid}`);
-  } else {
-    throw new Error("空白kid");
-  }
-};
-// Dynamic
-const openDynamic = dynamicId => {
-  if (dynamicId) {
-    $app.openURL(`https://m.bilibili.com/opus/${dynamicId}`);
-  }
-};
+}
 module.exports = {
-  openArticle,
-  openBangumi,
-  openDynamic,
-  openVideo,
-  openWebBrowser
+  openWeb
 };
