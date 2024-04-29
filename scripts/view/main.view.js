@@ -2,102 +2,40 @@ const { ListView, NavView, ViewKit } = require("../util/View");
 const VipView = require("./vip.view");
 const { showErrorAlertAndExit } = require("../util/JSBox");
 const COLOR = require("../config/color");
-const { LoginView } = require("./account.view");
-const EmoteService = require("../service/emote.service");
 const LiveService = require("../service/live.service");
 const $ = require("$");
+const { ListViewItemLoading } = require("Next");
 class MainView {
   constructor() {
     this.ListView = new ListView();
     this.ViewKit = new ViewKit();
     this.NavView = new NavView();
     this.MangaView = require("./manga.view");
-    this.DynamicView = require("./dynamic.view");
-  }
-  getEmoteList() {
-    try {
-      $.startLoading();
-      EmoteService.getAllEmoteList()
-        .then(result => {
-          $console.info(result);
-          $ui.push({
-            props: {
-              title: "listview"
-            },
-            views: [
-              {
-                type: "list",
-                props: {
-                  data: result.packages.map(emoteItem => emoteItem.text)
-                },
-                layout: $layout.fill,
-                events: {
-                  didSelect: (sender, indexPath, data) => {
-                    const { /*section, */ row } = indexPath;
-                    const emoteItem = result.packages[row];
-                    $console.info(emoteItem);
-                    const emoteList = emoteItem.emote;
-                    require("./content.view").openImage({
-                      id: "imageEmoteList",
-                      title: emoteItem.text,
-                      imageList: emoteList.map(item => item.url + "@1q.webp"),
-                      onClick: index => {
-                        $.startLoading();
-                        $quicklook.open({
-                          url: emoteList[index].url
-                        });
-                        $.stopLoading();
-                      }
-                    });
-                  }
-                }
-              }
-            ]
-          });
-        })
-        .catch(fail => {
-          $console.error(fail);
-        })
-        .finally(() => {
-          $.stopLoading();
-        });
-    } catch (error) {
-      $console.error(error);
-    }
   }
   init() {
     try {
       const title = "哔哩哔哩(已登录)",
-        textList = [
-          "漫画签到",
-          "动态",
-          "login data test",
-          "emote test",
-          "直播签到"
-        ],
-        didSelect = index => {
+        textList = ["漫画签到", "动态已移至我的页面", "直播签到", "设置", "test"],
+        didSelect = (indexPath, sender) => {
+          const index = indexPath.row,
+            listItemLoading = new ListViewItemLoading(sender);
           switch (index) {
             case 0:
-              this.MangaView.init();
+              listItemLoading.startLoading(indexPath);
+              this.MangaView.init().then(result => {
+                listItemLoading.stopLoading(indexPath);
+              });
               break;
             case 1:
-              this.DynamicView.init();
+              //this.DynamicView.init();
               break;
             case 2:
-              try {
-                new LoginView().checkLoginDataStatus();
-              } catch (error) {
-                $console.error(error);
-              }
-              break;
-            case 3:
-              this.getEmoteList();
-              break;
-            case 4:
               $.startLoading();
+              listItemLoading.startLoading(indexPath);
               new LiveService()
                 .checkIn()
                 .then(result => {
+                  listItemLoading.stopLoading(indexPath);
                   $.stopLoading();
                   $console.info(result);
                   $ui.alert({
@@ -117,6 +55,12 @@ class MainView {
                   $console.error(fail);
                   $ui.error("直播签到失败");
                 });
+              break;
+            case 3:
+              $prefs.open();
+              break;
+            case 4:
+              require("./test.view").init();
               break;
             default:
               $ui.error("?");
@@ -168,7 +112,7 @@ class MainView {
           },
           layout: $layout.fill,
           events: {
-            didSelect: (sender, indexPath, data) => didSelect(indexPath.row)
+            didSelect: (sender, indexPath, data) => didSelect(indexPath, sender)
           }
         },
         {
