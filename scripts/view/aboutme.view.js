@@ -95,14 +95,6 @@ class AboutmeView {
           labelTitle: {
             text: "电池"
           }
-        },
-        {
-          labelNumber: {
-            text: Number(resultData.gold / 100) || "?"
-          },
-          labelTitle: {
-            text: "电池"
-          }
         }
       ],
       moneyView = {
