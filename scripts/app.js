@@ -9,7 +9,8 @@ class App extends AppKernel {
     super({
       appId: "jsbox.zhihaofans.bilibili",
       appName: "哔哩哔哩",
-      author: "zhihaofans"
+      author: "zhihaofans",
+      l10nPath:"/strings/l10n.js"
     });
     this.Global = new GlobalStorage(this.AppInfo.id);
   }
