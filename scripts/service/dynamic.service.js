@@ -49,7 +49,31 @@ function getDynamic() {
     }
   });
 }
+function getDynamicDetail(id) {
+  return new Promise((resolve, reject) => {
+    const url =
+      "https://api.bilibili.com/x/polymer/web-dynamic/v1/detail?id=" + id;
+    try {
+      $console.info("trystart");
+      Http.getThen({
+        url,
+        header: {
+          cookie
+        }
+      })
+        .then(data => {
+          resolve(data.data);
+        })
+        .catch(fail => reject(fail));
+      $console.info("try");
+    } catch (error) {
+      $console.error(error);
+      reject(error);
+    }
+  });
+}
 module.exports = {
   getDynamic,
+  getDynamicDetail,
   getDynamicList
 };

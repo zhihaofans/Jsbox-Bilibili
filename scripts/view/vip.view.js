@@ -29,6 +29,7 @@ class VipPage {
             case 1:
               this.showVipPoint();
               break;
+
             default:
               $ui.warning("开发中");
           }
