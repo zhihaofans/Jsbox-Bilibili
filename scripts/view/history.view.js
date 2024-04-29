@@ -1,7 +1,7 @@
 const { FavoriteItem, PublishItemData } = require("../model/history.model");
 const HistoryService = require("../service/history.service");
 const { ListView } = require("../util/View");
-const AppService = require("../service/app.service");
+const BiliService = require("../service/bili.service");
 const PostDetailView = require("./post.detail.view");
 const { hasString } = require("../util/String");
 class VideoList {
@@ -163,20 +163,20 @@ class VideoList {
         if (isHistory === true) {
           switch (videoItem.business) {
             case "pgc":
-              AppService.openBangumi(videoItem.kid);
+              BiliService.openBangumi(videoItem.kid);
               break;
             case "article":
-              AppService.openArticle(videoItem.kid);
+              BiliService.openArticle(videoItem.kid);
               break;
             case "live":
               $console.info(videoItem);
               $app.openURL(videoItem.uri);
               break;
             default:
-              AppService.openVideo(videoItem.bvid);
+              BiliService.openVideo(videoItem.bvid);
           }
         } else {
-          AppService.openVideo(videoItem.bvid);
+          BiliService.openVideo(videoItem.bvid);
         }
       };
     const later2watchNavMenu = [

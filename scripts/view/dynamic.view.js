@@ -1,6 +1,7 @@
 const { getDynamicList } = require("../service/dynamic.service");
 const { DynamicItemData } = require("../model/dynamic.model");
 const AppService = require("../service/app.service");
+const BiliService = require("../service/bili.service");
 const PostDetailView = require("./post.detail.view");
 const HistoryView = require("./history.view");
 const { openDynamic } = require("../service/app.service");
@@ -39,13 +40,13 @@ function showDynamicList(title, dynamicListData) {
         dynamicItem
       });
       if (dynamicItem.dynamic_type === 8 && dynamicItem.bvid !== undefined) {
-        AppService.openVideo(dynamicItem.bvid);
+        BiliService.openVideo(dynamicItem.bvid);
       } else {
         switch (dynamicItem.dynamic_type) {
           case 512:
           case 11:
           case 64:
-            $app.openURL(dynamicItem.url);
+            AppService.openWeb(dynamicItem.url);
             break;
           default:
             $ui.alert({
@@ -56,12 +57,9 @@ function showDynamicList(title, dynamicListData) {
                   title: "打开动态",
                   disabled: false, // Optional
                   handler: () => {
-                    $safari.open({
-                      url: `https://m.bilibili.com/opus/${dynamicItem.dynamic_id_str}`,
-                      entersReader: true,
-                      height: 360,
-                      handler: function () {}
-                    });
+                    AppService.openWeb(
+                      `https://m.bilibili.com/opus/${dynamicItem.dynamic_id_str}`
+                    );
                   }
                 },
                 {
@@ -170,12 +168,7 @@ function showDynamicList(title, dynamicListData) {
                   case 4:
                     const url = `https://m.bilibili.com/opus/${selectItem.dynamic_id_str}`;
                     $console.info(url);
-                    $safari.open({
-                      url,
-                      entersReader: true,
-                      height: 360,
-                      handler: function () {}
-                    });
+                    AppService.openWeb(url);
                     break;
                   default:
                 }

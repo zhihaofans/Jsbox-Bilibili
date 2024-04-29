@@ -2,7 +2,7 @@ const AccountService = require("../service/account.service");
 const UserService = require("../service/user.service");
 const { ImageView, ListView } = require("../util/View");
 const { showDoubleInputAlert } = require("../util/Alert");
-const AppService = require("../service/app.service");
+const BiliService = require("../service/bili.service");
 const { hasString } = require("../util/String");
 class LoginView {
   constructor(app) {
@@ -89,7 +89,7 @@ class LoginView {
                 },
                 buttonTwoTitle = "App登录",
                 buttonTwoTapped = sender => {
-                  AppService.openWebBrowser(url);
+                  BiliService.openWebBrowser(url);
                 };
               this.ImageView.showImageAndTwoButton({
                 title,
