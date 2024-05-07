@@ -1,10 +1,8 @@
 const { ListView, NavView, ViewKit } = require("../util/View");
-const VipView = require("./vip.view");
 const { showErrorAlertAndExit } = require("../util/JSBox");
 const COLOR = require("../config/color");
 const LiveService = require("../service/live.service");
 const $ = require("$");
-const { ListViewItemLoading } = require("Next");
 class MainView {
   constructor() {
     this.ListView = new ListView();
@@ -15,51 +13,14 @@ class MainView {
   init() {
     try {
       const title = "哔哩哔哩(已登录)",
-        textList = ["漫画签到", "动态已移至我的页面", "直播签到", "设置", "test"],
+        textList = ["设置", "test"],
         didSelect = (indexPath, sender) => {
-          const index = indexPath.row,
-            listItemLoading = new ListViewItemLoading(sender);
+          const index = indexPath.row;
           switch (index) {
             case 0:
-              listItemLoading.startLoading(indexPath);
-              this.MangaView.init().then(result => {
-                listItemLoading.stopLoading(indexPath);
-              });
-              break;
-            case 1:
-              //this.DynamicView.init();
-              break;
-            case 2:
-              $.startLoading();
-              listItemLoading.startLoading(indexPath);
-              new LiveService()
-                .checkIn()
-                .then(result => {
-                  listItemLoading.stopLoading(indexPath);
-                  $.stopLoading();
-                  $console.info(result);
-                  $ui.alert({
-                    title: "直播签到" + result.code,
-                    message: result.message,
-                    actions: [
-                      {
-                        title: "OK",
-                        disabled: false, // Optional
-                        handler: () => {}
-                      }
-                    ]
-                  });
-                })
-                .catch(fail => {
-                  $.stopLoading();
-                  $console.error(fail);
-                  $ui.error("直播签到失败");
-                });
-              break;
-            case 3:
               $prefs.open();
               break;
-            case 4:
+            case 1:
               require("./test.view").init();
               break;
             default:
@@ -77,7 +38,7 @@ class MainView {
             title: "大会员",
             icon: "person.icloud",
             func: () => {
-              new VipView().init();
+              $ui.error("该功能已移除");
             }
           },
           {

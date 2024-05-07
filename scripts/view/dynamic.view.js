@@ -6,6 +6,12 @@ const PostDetailView = require("./post.detail.view");
 const HistoryView = require("./history.view");
 const { openDynamic } = require("../service/app.service");
 const $ = require("$");
+class DynamicView{
+  constructor(){
+    
+  }
+  showDoubleList(){}
+}
 function showDynamicList(title, dynamicListData) {
   const itemList = dynamicListData.map(dynamicItem => {
       const typeStrList = {

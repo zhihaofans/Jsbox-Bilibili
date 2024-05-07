@@ -202,9 +202,20 @@ class AboutmeView {
           func: () => require("./dynamic.view").init()
         },
         {
-          text: "签到?",
+          text: "订阅",
+          icon: "yensign.circle.fill",
+          func: () => {
+            const SubscribeView = require("./subscribe.view");
+            new SubscribeView().init();
+          }
+        },
+        {
+          text: "签到",
           icon: "pencil",
-          func: () => {}
+          func: () => {
+            const CheckinView = require("./checkin.view");
+            new CheckinView().init();
+          }
         }
       ],
       historyTabData = historyTabMenu.map(it => {

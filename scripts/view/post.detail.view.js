@@ -151,6 +151,12 @@ class PostDetailView {
                 },
                 tapped: sender => {
                   $console.info(videoInfo.pic);
+                  require("./content.view").openImage({
+                    id: "",
+                    title: "",
+                    imageList: [videoInfo.pic],
+                    onClick: index => {}
+                  });
                 }
               }),
               ViewTemplate.getLabel({
