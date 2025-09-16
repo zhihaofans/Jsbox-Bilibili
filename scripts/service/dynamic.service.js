@@ -3,6 +3,34 @@ const AccountService = require("./account.service");
 const cookie = AccountService.getCookie(),
   uid = AccountService.getUid();
 const { DynamicItemData } = require("../model/dynamic.model");
+class DynamicService {
+  constructor() {}
+  getDynamicList(_offset) {
+    return new Promise((resolve, reject) => {
+      let url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/all`;
+      if (_offset !== undefined) {
+        url += `?offset=` + _offset;
+      }
+      try {
+        $console.info("trystart");
+        Http.getThen({
+          url,
+          header: {
+            cookie
+          }
+        })
+          .then(data => {
+            resolve(data.data);
+          })
+          .catch(fail => reject(fail));
+        $console.info("try");
+      } catch (error) {
+        $console.error(error);
+        reject(error);
+      }
+    });
+  }
+}
 function getDynamicList() {
   return new Promise((resolve, reject) => {
     const url = `https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/dynamic_new?uid=${uid}&type_list=268435455&from=weball&platform=web`;
@@ -73,6 +101,7 @@ function getDynamicDetail(id) {
   });
 }
 module.exports = {
+  DynamicService,
   getDynamic,
   getDynamicDetail,
   getDynamicList

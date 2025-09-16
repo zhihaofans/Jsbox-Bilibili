@@ -28,62 +28,35 @@ class Downloader {
                     $$.stopLoading();
                     const { data } = result;
                     if (result.code === 0 && data.result === "suee") {
-                      const videoDash = data.dash;
+                      const videoData = data.durl;
 
                       $ui.push({
                         props: {
-                          title: "音视频分开下载"
+                          title: data.format
                         },
                         views: [
                           {
                             type: "list",
                             props: {
-                              data: [
-                                {
-                                  title: "视频",
-                                  rows: videoDash.video.map(
-                                    v =>
-                                      `${VIDEO_QUALITY_STR[v.id.toString()]}/${
-                                        v.width
-                                      }x${v.height}(${v.frameRate}fps)/${
-                                        v.codecs
-                                      }`
-                                  )
-                                },
-                                {
-                                  title: "音频",
-                                  rows: videoDash.audio.map(
-                                    a =>
-                                      `${AUDIO_QUALITY_STR[a.id.toString()]}(${
-                                        a.id
-                                      })`
-                                  )
-                                }
-                              ]
+                              data: videoData.map(
+                                v => `${(v.size / 1024).toFixed(0)} KB`
+                              )
                             },
                             layout: $layout.fill,
                             events: {
                               didSelect: (sender, indexPath, data) => {
-                                const { section, row } = indexPath;
-                                switch (section) {
-                                  case 0:
-                                    $input.text({
-                                      type: $kbType.text,
-                                      placeholder: "",
-                                      text: videoDash.video[row].baseUrl,
-                                      handler: text => {}
-                                    });
-                                    break;
-                                  case 1:
-                                    $input.text({
-                                      type: $kbType.text,
-                                      placeholder: "",
-                                      text: videoDash.audio[row].baseUrl,
-                                      handler: text => {}
-                                    });
-                                    break;
-                                  default:
-                                }
+                                const { section, row } = indexPath,
+                                  v = videoData[row];
+
+                                $input.text({
+                                  type: $kbType.text,
+                                  placeholder: "",
+                                  text: v.url,
+                                  handler: text => {
+                                    const downloadService = new VideoService.VideoDownloader();
+                                    downloadService.startToDownload(v.url);
+                                  }
+                                });
                               }
                             }
                           }
