@@ -2,10 +2,35 @@ const { HttpService } = require("./http.service");
 const httpService = new HttpService();
 const { getCookie } = require("./account.service");
 const { hasString } = require("../util/String");
-class ExampleService {
+class MangaService {
   constructor() {}
-  test() {
-    return new Promise((resolve, reject) => {});
+  getCouponsList() {
+    return new Promise((resolve, reject) => {
+      const url = "https://manga.bilibili.com/twirp/user.v1.User/GetCoupons";
+          try {
+            $console.info("trystart");
+            httpService
+              .postThen({
+                url,
+                params: {
+                  platform: "android"
+                },
+                header: {
+                  cookie: getCookie()
+                }
+              })
+              .then(result => {
+                $console.info("mangacheckin");
+                resolve(result.data);
+                $console.info("mangacheckin", "end");
+              })
+              .catch(fail => reject(fail));
+            $console.info("try");
+          } catch (error) {
+            $console.error(error);
+            reject(error);
+          }
+    });
   }
 }
 class HttpExampleService {
