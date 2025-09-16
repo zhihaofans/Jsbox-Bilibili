@@ -4,18 +4,34 @@ const AccountService = require("./account.service");
 const Http = new HttpService();
 class VideoDownloader {
   constructor() {}
+  startToDownload(url, savePath) {
+    return new Promise((resolve, reject) => {
+      $http.download({
+        url,
+        header: {
+          Cookie: AccountService.getCookie(),
+          referer: "https://www.bilibili.com",
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
+        },
+        showsProgress: true, // Optional, default is true
+        backgroundFetch: true, // Optional, default is false
+        progress: function (bytesWritten, totalBytes) {
+          const percentage = (bytesWritten * 1.0) / totalBytes;
+          $console.info(`download:${percentage}`);
+        },
+        handler: function (resp) {
+          $share.sheet(resp.data);
+        }
+      });
+    });
+  }
   downloadWebVideo(bvid, cid) {
     return new Promise((resolve, reject) => {
-      const url = `https://api.bilibili.com/x/player/playurl`;
+      const url = `https://api.bilibili.com/x/player/wbi/playurl?bvid=${bvid}&cid=${cid}&qn=120&fourk=1&fnval&128=128`;
       Http.getThen({
         url,
-        params: {
-          bvid,
-          cid,
-          fourk: 1,
-          fnval: 16,
-          fnver: 0
-        },
+        
         header: {
           Cookie: AccountService.getCookie()
         }
@@ -107,6 +123,7 @@ function sendCoinToVideo(bvid) {
   });
 }
 module.exports = {
+  VideoDownloader,
   downloadVideo: new VideoDownloader().downloadWebVideo,
   getVideoInfo,
   sendCoinToVideo

@@ -35,8 +35,8 @@ class MainView {
             func: () => {}
           },
           {
-            title: "大会员",
-            icon: "person.icloud",
+            title: "工具",
+            icon: "square.grid.2x2",
             func: () => {
               $ui.error("该功能已移除");
             }

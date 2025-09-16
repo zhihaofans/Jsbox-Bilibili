@@ -199,7 +199,10 @@ class AboutmeView {
         {
           text: "动态",
           icon: "list.dash",
-          func: () => require("./dynamic.view").init()
+          func: () => {
+            const { DynamicView } = require("./dynamic.view");
+            new DynamicView().init();
+          }
         },
         {
           text: "订阅",

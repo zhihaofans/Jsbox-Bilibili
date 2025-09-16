@@ -12,8 +12,8 @@ class CheckinView {
           {
             text: "漫画签到",
             func: listItemLoading => {
-              require("./manga.view")
-                .init()
+             const mangaView= require("./manga.view")
+                new mangaView().askCheckin()
                 .then(result => {});
             }
           },
@@ -48,7 +48,7 @@ class CheckinView {
         ]
       },
       {
-        title: "大会员每月签到",
+        title: "大会员签到",
         items: [
           {
             text: "大积分签到",
@@ -68,10 +68,11 @@ class CheckinView {
                   $ui.error("error");
                 });
             }
-          },{
+          },
+          {
             text: "大会员权益",
             func: listItemLoading => {
-            this.showVipPrivilege()
+              this.showVipPrivilege();
             }
           }
         ]

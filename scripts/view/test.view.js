@@ -82,11 +82,25 @@ function init() {
     },
     "旧个人页面": () => {
       require("./aboutme.view").initOld();
+    },
+    "双列动态": () => {
+      const { DynamicView } = require("./dynamic.view");
+      new DynamicView().init();
+    },
+    "DynamicService": () => {
+      const { DynamicService } = require("../service/dynamic.service");
+      new DynamicService().getDynamicList().then(result => {
+        $console.info(result);
+      });
+    },
+    "漫画": () => {
+      const MangaView = require("./manga.view");
+      new MangaView().init();
     }
   };
   $ui.push({
     props: {
-      title: "listview"
+      title: "TEST"
     },
     views: [
       {
