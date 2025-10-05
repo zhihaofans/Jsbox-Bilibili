@@ -31,7 +31,7 @@ class VideoDownloader {
       const url = `https://api.bilibili.com/x/player/wbi/playurl?bvid=${bvid}&cid=${cid}&qn=120&fourk=1&fnval&128=128`;
       Http.getThen({
         url,
-        
+
         header: {
           Cookie: AccountService.getCookie()
         }

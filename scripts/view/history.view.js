@@ -46,18 +46,14 @@ class VideoList {
               {
                 title: "是",
                 disabled: false, // Optional
-                handler: () => {
-          
-                }
+                handler: () => {}
               },
               {
                 title: "嫑",
-                handler: () => {
-          
-                }
+                handler: () => {}
               }
             ]
-          })
+          });
         }
       }
     ];

@@ -32,7 +32,7 @@ const TYPE_STR_LIST_NEW = {
   //"DYNAMIC_TYPE_SUBSCRIPTION": "",
   "DYNAMIC_TYPE_LIVE_RCMD": "直播开播",
   //"DYNAMIC_TYPE_BANNER": "",
-  "DYNAMIC_TYPE_UGC_SEASON": "合集更新",
+  "DYNAMIC_TYPE_UGC_SEASON": "合集更新"
   //"DYNAMIC_TYPE_SUBSCRIPTION_NEW": ""
 };
 class DynamicItemData {
@@ -126,19 +126,19 @@ class NewDynamicItemData {
     this.modules = item.modules;
     this.id_str = item.id_str;
     this.type = item.type;
-    this.type_str = TYPE_STR_LIST_NEW[item.type]||item.type
+    this.type_str = TYPE_STR_LIST_NEW[item.type] || item.type;
     this.visible = item.visible;
     this.author_id = item.modules.module_author.mid;
 
     this.author_face = item.modules.module_author.face;
-    this.cover = this.author_face;
+    //this.cover = this.author_face;
     switch (item.type) {
-      //转发动态
+      //带图动态
       case "DYNAMIC_TYPE_DRAW":
-        this.text = this.modules.module_dynamic.desc.text;
-        this.images = this.modules.module_dynamic.major.draw.items.map(
-          it => it.src
-        );
+        this.text = this.modules.module_dynamic?.desc?.text || item.type;
+        this.images =
+          this.modules.module_dynamic.major?.draw?.items?.map(it => it.src) ||
+          [];
         this.cover = this.images[0];
         break;
       case "DYNAMIC_TYPE_FORWARD":
@@ -148,7 +148,7 @@ class NewDynamicItemData {
           this.origin_dynamic_data = new NewDynamicItemData(
             this.origin_dynamic
           );
-          this.type_str+="\n"+this.origin_dynamic_data.type_str
+          this.type_str += "\n" + this.origin_dynamic_data.type_str;
           this.cover = this.origin_dynamic_data.cover || this.cover;
         }
 
@@ -180,7 +180,16 @@ class NewDynamicItemData {
     //this.cover =this.modules.module_dynamic?.additional?.common?.cover ||
     //this.text=this.modules.module_dynamic?.desc.text
     $console.warn(this.type_str);
-    this.author_name = item.modules.module_author.name + "\n" + this.type_str;
+    this.author_name = item.modules.module_author.name;
+    //作者名不再附带动态类型
+    //+ "\n" + this.type_str;
+    if (
+      this.cover !== undefined &&
+      this.cover.length > 0 &&
+      this.cover.indexOf("@1q.webp") < 0
+    ) {
+      this.cover += "@1q.webp";
+    }
   }
 }
 module.exports = {

@@ -35,10 +35,11 @@ class MainView {
             func: () => {}
           },
           {
-            title: "工具",
-            icon: "square.grid.2x2",
+            title: "动态",
+            icon: "rectangle.grid.3x2",
             func: () => {
-              $ui.error("该功能已移除");
+              const { DynamicView } = require("./dynamic.view");
+              new DynamicView().init();
             }
           },
           {

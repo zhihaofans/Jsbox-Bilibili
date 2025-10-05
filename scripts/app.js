@@ -10,7 +10,7 @@ class App extends AppKernel {
       appId: "jsbox.zhihaofans.bilibili",
       appName: "哔哩哔哩",
       author: "zhihaofans",
-      l10nPath:"/strings/l10n.js"
+      l10nPath: "/strings/l10n.js"
     });
     this.Global = new GlobalStorage(this.AppInfo.id);
   }

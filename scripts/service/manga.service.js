@@ -4,32 +4,62 @@ const { getCookie } = require("./account.service");
 const { hasString } = require("../util/String");
 class MangaService {
   constructor() {}
+  checkin() {
+    return new Promise((resolve, reject) => {
+      const url =
+        "https://manga.bilibili.com/twirp/activity.v1.Activity/ClockIn";
+      try {
+        $console.info("trystart");
+        httpService
+          .postThen({
+            url,
+            params: {
+              platform: "android"
+            },
+            header: {
+              cookie: getCookie()
+            }
+          })
+          .then(result => {
+            $console.info("mangacheckin");
+            resolve(result.data);
+            $console.info("mangacheckin", "end");
+          })
+          .catch(fail => reject(fail));
+        $console.info("try");
+      } catch (error) {
+        $console.error(error);
+        reject(error);
+      }
+    });
+  }
   getCouponsList() {
     return new Promise((resolve, reject) => {
       const url = "https://manga.bilibili.com/twirp/user.v1.User/GetCoupons";
-          try {
-            $console.info("trystart");
-            httpService
-              .postThen({
-                url,
-                params: {
-                  platform: "android"
-                },
-                header: {
-                  cookie: getCookie()
-                }
-              })
-              .then(result => {
-                $console.info("mangacheckin");
-                resolve(result.data);
-                $console.info("mangacheckin", "end");
-              })
-              .catch(fail => reject(fail));
-            $console.info("try");
-          } catch (error) {
-            $console.error(error);
-            reject(error);
-          }
+      try {
+        $console.info("trystart");
+        httpService
+          .postThen({
+            url,
+            body: {
+              pageNum: 1,
+              pageSize: 100
+            },
+            header: {
+              cookie: getCookie()
+            }
+          })
+          .then(result => {
+            $console.info("getCouponsList");
+            resolve(result.data);
+            $console.info("getCouponsList", "end");
+          })
+          .catch(fail => reject(fail));
+        $console.info("try");
+      } catch (error) {
+        $console.error(error);
+        reject(error);
+      }
     });
   }
 }
@@ -61,34 +91,4 @@ class HttpExampleService {
     });
   }
 }
-function checkin() {
-  return new Promise((resolve, reject) => {
-    const url = "https://manga.bilibili.com/twirp/activity.v1.Activity/ClockIn";
-    try {
-      $console.info("trystart");
-      httpService
-        .postThen({
-          url,
-          params: {
-            platform: "android"
-          },
-          header: {
-            cookie: getCookie()
-          }
-        })
-        .then(result => {
-          $console.info("mangacheckin");
-          resolve(result.data);
-          $console.info("mangacheckin", "end");
-        })
-        .catch(fail => reject(fail));
-      $console.info("try");
-    } catch (error) {
-      $console.error(error);
-      reject(error);
-    }
-  });
-}
-module.exports = {
-  checkin
-};
+module.exports = MangaService;

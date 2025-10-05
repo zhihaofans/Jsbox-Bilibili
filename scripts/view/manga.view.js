@@ -1,32 +1,37 @@
 const MangaService = require("../service/manga.service");
 class MangaView {
-  constructor() {}
+  constructor() {
+    this.MangaService = new MangaService();
+  }
   init() {
     $ui.push({
       props: {
         title: "漫画"
-        },
-        views: [
-          {
-              type: "list",
-              props: {
-                data: ["签到","漫画券"]
-              },
-              layout: $layout.fill,
-              events: {
-                didSelect: (sender, indexPath, data) => {
-                  const { section, row } = indexPath;
-                  switch (row) {
-                    case 0:
-                    this.askCheckin()
-                    break;
-                    default:
-                  }
-                }
+      },
+      views: [
+        {
+          type: "list",
+          props: {
+            data: ["签到", "漫画券"]
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (sender, indexPath, data) => {
+              const { section, row } = indexPath;
+              switch (row) {
+                case 0:
+                  this.askCheckin();
+                  break;
+                case 1:
+                  this.getCouponsList();
+                  break;
+                default:
               }
             }
-          ]
-        });
+          }
+        }
+      ]
+    });
   }
   askCheckin() {
     return new Promise((resolve, reject) => {
@@ -65,7 +70,7 @@ class MangaView {
   startCheckin() {
     return new Promise((resolve, reject) => {
       $ui.loading(true);
-      MangaService.checkin()
+      this.MangaService.checkin()
         .then(result => {
           $ui.loading(false);
           $console.info(result);
@@ -107,6 +112,73 @@ class MangaView {
         })
         .finally(() => {
           $console.info("MangaService.checkin:finally");
+        });
+    });
+  }
+  getCouponsList() {
+    return new Promise((resolve, reject) => {
+      $ui.loading(true);
+      this.MangaService.getCouponsList()
+        .then(result => {
+          $ui.loading(false);
+          $console.info(result);
+          if (result.code === 0) {
+            $ui.success("签到成功");
+            $ui.push({
+              props: {
+                title: "listview"
+              },
+              views: [
+                {
+                  type: "list",
+                  props: {
+                    data: result.data.user_coupons.map(it => {})
+                  },
+                  layout: $layout.fill,
+                  events: {
+                    didSelect: (sender, indexPath, data) => {
+                      const { section, row } = indexPath;
+                    }
+                  }
+                }
+              ]
+            });
+            resolve(true);
+          } else {
+            $ui.alert({
+              title: `获取失败${result.code}`,
+              message: result.msg || "未知错误",
+              actions: [
+                {
+                  title: "OK",
+                  disabled: false, // Optional
+                  handler: () => {
+                    resolve(false);
+                  }
+                }
+              ]
+            });
+          }
+        })
+        .catch(fail => {
+          $console.error(fail);
+          $ui.loading(false);
+          $ui.alert({
+            title: "获取错误",
+            message: fail.message || "未知错误",
+            actions: [
+              {
+                title: "OK",
+                disabled: false, // Optional
+                handler: () => {
+                  resolve(false);
+                }
+              }
+            ]
+          });
+        })
+        .finally(() => {
+          $console.info("MangaService.getCouponsList:finally");
         });
     });
   }

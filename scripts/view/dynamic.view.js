@@ -11,9 +11,10 @@ const AppService = require("../service/app.service");
 const BiliService = require("../service/bili.service");
 const PostDetailView = require("./post.detail.view");
 const HistoryView = require("./history.view");
+const DynamicDetailView = require("./dynamic.detail.view");
 const { openDynamic } = require("../service/app.service");
 const $ = require("$");
-class DynamicDetailView {
+class DynamicDetailViewOld {
   constructor() {
     this.DynamicService = new DynamicService();
     this.SUPPORT_TYPE = [2, 4];
@@ -80,7 +81,7 @@ class DynamicView {
           $console.info(this.dynamicList);
           this.OFFSET_ID = result.data.offset;
           this.hasMore = result.data.has_more;
-          this.showDoubleList(this.dynamicList);
+          this.showSingleList(this.dynamicList);
         } else {
           $ui.error(result.message);
         }
@@ -102,16 +103,87 @@ class DynamicView {
       $console.info(dynamicItem);
       const typeStr = dynamicItem.dynamic_type_str;
       return {
+        imageFace:{
+          src: dynamicItem.author_face + "@1q.webp"
+        },
         labelTitle: {
-          text: dynamicItem.text || "开发中"
+          text: dynamicItem.text || "无标题"
         },
         labelAuthor: {
-          text: "@" + dynamicItem.author_name + "\n" + `[${typeStr}]`
+          text: dynamicItem.author_name
+          //+ "\n" + `[${typeStr}]`
         },
         imageCover: {
-          src: dynamicItem.cover + "@1q.webp"
+          src: dynamicItem.cover
         }
       };
+    });
+  }
+  showSingleList(dynamicListData) {
+    const didSelect = (section, row) => {
+      const dynamicItem = this.dynamicList[row];
+      $console.info({
+        dynamicItem
+      });
+      switch (dynamicItem.type) {
+        case "DYNAMIC_TYPE_DRAW":
+          this.DynamicDetailView.showImageDynamic(dynamicItem);
+          break;
+        case "DYNAMIC_TYPE_AV":
+          new PostDetailView().showVideoDetail(dynamicItem.bvid);
+          break;
+        default:
+      }
+    };
+    $ui.push({
+      props: {
+        title: this.TITLE
+      },
+      views: [
+        {
+          type: "matrix",
+          props: {
+            id: "dynamicList",
+            columns: 1,
+            
+            itemHeight: 300, //每行高度
+            square: false,
+            spacing: 2, //间隔
+            template: require("./components/post.item.simple.template"),
+            data: this.dynamicListToItemList(),
+            header: {
+              type: "label",
+              props: {
+                height: 20,
+                text: `共${dynamicListData.length || 0}个动态`,
+                textColor: $color("#AAAAAA"),
+                align: $align.center,
+                font: $font(12)
+              }
+            },
+            footer: {
+              type: "label",
+              props: {
+                height: 20,
+                text: "上拉看旧动态",
+                textColor: $color("#AAAAAA"),
+                align: $align.center,
+                font: $font(12)
+              }
+            }
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (sender, indexPath, data) =>
+              didSelect(indexPath.section, indexPath.row),
+            didReachBottom: sender => {
+              $console.info("didReachBottom");
+              //$.stopLoading();
+              this.loadNewDynamic(sender);
+            }
+          }
+        }
+      ]
     });
   }
   showDoubleList(dynamicListData) {
@@ -143,7 +215,7 @@ class DynamicView {
             itemHeight: 200, //每行高度
             square: false,
             spacing: 2, //间隔
-            template: require("./components/post.item.simple.template"),
+            template: require("./components/post.item.double.template"),
             data: this.dynamicListToItemList(),
             header: {
               type: "label",
@@ -430,11 +502,41 @@ function init() {
         showDynamicList("动态", dynamicList);
       } else {
         $ui.error(result.message);
+        $ui.alert({
+          title: "动态加载失败",
+          message: result.message,
+          actions: [
+            {
+              title: "OK",
+              disabled: false, // Optional
+              handler: () => {}
+            },
+            {
+              title: "Cancel",
+              handler: () => {}
+            }
+          ]
+        });
       }
     })
     .catch(fail => {
       $ui.loading(false);
       $console.error(fail);
+      $ui.alert({
+        title: "动态加载报错",
+        message: "可能是服务器数据版本更新",
+        actions: [
+          {
+            title: "OK",
+            disabled: false, // Optional
+            handler: () => {}
+          },
+          {
+            title: "Cancel",
+            handler: () => {}
+          }
+        ]
+      });
     });
 }
 

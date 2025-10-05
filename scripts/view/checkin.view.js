@@ -1,5 +1,4 @@
 const { ListViewItemLoading } = require("Next");
-const LiveService = require("../service/live.service");
 const VipService = require("../service/vip.service");
 const $ = require("$");
 class CheckinView {
@@ -12,37 +11,8 @@ class CheckinView {
           {
             text: "漫画签到",
             func: listItemLoading => {
-             const mangaView= require("./manga.view")
-                new mangaView().askCheckin()
-                .then(result => {});
-            }
-          },
-          {
-            text: "直播签到",
-            func: listItemLoading => {
-              $.startLoading();
-              new LiveService()
-                .checkIn()
-                .then(result => {
-                  $.stopLoading();
-                  $console.info(result);
-                  $ui.alert({
-                    title: "直播签到" + result.code,
-                    message: result.message,
-                    actions: [
-                      {
-                        title: "OK",
-                        disabled: false, // Optional
-                        handler: () => {}
-                      }
-                    ]
-                  });
-                })
-                .catch(fail => {
-                  $.stopLoading();
-                  $console.error(fail);
-                  $ui.error("直播签到失败");
-                });
+              const mangaView = require("./manga.view");
+              new mangaView().askCheckin().then(result => {});
             }
           }
         ]
