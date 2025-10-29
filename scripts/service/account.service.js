@@ -225,7 +225,7 @@ const accountService = {
     return UserData.setCookie(_cookie) && UserData.setCsrf(_csrf);
   },
   isLogin: () => Login.isLogin(),
-  checkLoginStatus: () => Login.checkLoginStatus(),
+  checkLoginStatus: checkLoginDataStatus,
   getQrcodeKey: () => Login.getQrcodeKey(),
   loginByQrcode: _qrcodeKey => Login.loginByQrcode(_qrcodeKey),
   logout: () => Login.logout(),
